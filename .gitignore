@@ -1,0 +1,28 @@
+# Secrets
+.env
+
+# Raw sequencing data and alignments never enter the repo
+*.fastq
+*.fastq.gz
+*.fq
+*.fq.gz
+*.bam
+*.bai
+*.sam
+data/
+
+# Vendor PDFs are referenced by URL in library/manifest.csv, not redistributed
+library/pdfs/
+
+# Generated artifacts
+vector_db/
+tests/toy/out/
+*.idx
+kallisto_index*
+stranded_test_*/
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.DS_Store

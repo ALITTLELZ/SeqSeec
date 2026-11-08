@@ -1,0 +1,36 @@
+# File: envs/tools-osx64.yml
+# Version: 0.2.0
+# Last modified: 2026-11-08 (Track B)
+# Change: Pin how_are_we_stranded_here to GitHub commit e6ce74d; switch BLAS to OpenBLAS.
+#
+# Bioinformatics tools used by step 4 (local data check). Kept separate from
+# the Python app environment because how_are_we_stranded_here recommends
+# kallisto 0.44.0, which bioconda only ships for osx-64 / linux-64.
+#
+# Apple Silicon (runs under Rosetta):
+#   CONDA_SUBDIR=osx-64 mamba env create -f envs/tools-osx64.yml
+#   conda config --file "$CONDA_PREFIX/.condarc" --set subdir osx-64   # after activating
+# Linux / HPC: the same file works without CONDA_SUBDIR.
+#
+# Why these pins (found during the 2026-11-08 smoke tests, see CHANGELOG.md):
+#   * how_are_we_stranded_here 1.0.1 on bioconda (2022) breaks with pandas 2.x,
+#     fails on FASTA headers without a description, and has no single-end mode.
+#     All three are fixed on GitHub master, commit e6ce74d (2022-07-05), which
+#     was never released, so we install that exact commit with pip.
+#   * Intel MKL prints SSE4.2 deprecation warnings under Rosetta; they end up in
+#     the tool's result file and break its parser. OpenBLAS avoids this.
+name: seqseec-tools
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.10
+  - kallisto=0.44.0
+  - rseqc
+  - pandas
+  - numpy
+  - nomkl
+  - libblas=*=*openblas
+  - pip
+  - pip:
+      - https://github.com/signalbash/how_are_we_stranded_here/archive/e6ce74ddf79fa9c8e659b8a9073e11bb4291d016.zip
