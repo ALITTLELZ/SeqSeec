@@ -2,6 +2,21 @@
 
 Dated record of every change, its reason, and its owner. Newest first.
 
+## 2026-11-18 — steps 5–6: reconcile and settings (XD, branch `feat/reconcile-settings`)
+
+### Added
+- `seqseec/settings.py` (step 6): fixed lookup from orientation (FR / RF / UNSTRANDED) and layout (PE / SE) to featureCounts, HISAT2, Salmon, kallisto, HTSeq and STAR settings, plus the library-type name and the dominant RSeQC pattern. The patterns come from `datacheck.py`, so there is a single source. Single-end differs only for HISAT2 (`F`/`R`) and Salmon (`SF`/`SR`/`U`). Accepts `fr-firststrand`-style aliases.
+- `seqseec/reconcile.py` (step 5): the plan §5 decision table with states CONCORDANT, CONFLICT, INCONCLUSIVE, UNVERIFIED, DATA_ONLY and INSUFFICIENT. On CONFLICT the settings follow the data, are marked provisional and require human review, and the result lists likely causes. Takes the datacheck result dict directly; its layout takes precedence.
+- `tests/test_settings.py`, `tests/test_reconcile.py`: every cell of the 4 × 6 decision grid, the full settings table, aliases and bad input.
+
+### Decisions (for team review)
+- `AMBIGUOUS` from step 3 is treated as INSUFFICIENT and flagged (`document_ambiguous`).
+- An INCONCLUSIVE data call with no document answer gives INSUFFICIENT, because neither side gives a direction.
+- UNVERIFIED still returns the document's settings, marked provisional and not verified by data.
+
+### Still to do
+- Check every settings value against each tool's official documentation before `v0.3-frozen`.
+
 ## 2026-11-08 — v0.1-env (Track B)
 
 ### Added
