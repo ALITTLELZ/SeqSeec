@@ -14,8 +14,9 @@ Dated record of every change, its reason, and its owner. Newest first.
 - An INCONCLUSIVE data call with no document answer gives INSUFFICIENT, because neither side gives a direction.
 - UNVERIFIED still returns the document's settings, marked provisional and not verified by data.
 
-### Still to do
-- Check every settings value against each tool's official documentation before `v0.3-frozen`.
+### Verified
+- Every settings value was checked against the tool's official documentation or source and matched the plan §5 table; no changes were needed. Sources are recorded in `settings.SOURCES`: featureCounts (Subread usage text), HISAT2 manual, Salmon library-type docs, kallisto manual, HTSeq docs and the STAR manual.
+- The kallisto manual says nothing about stranded single-end reads. The v0.44.0 source does not restrict `--fr-stranded`/`--rf-stranded` to paired-end, so the same flags are used for single-end.
 
 ## 2026-11-08 — v0.1-env (Track B)
 

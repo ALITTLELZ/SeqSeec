@@ -5,7 +5,7 @@
 import pytest
 
 from seqseec.datacheck import FORWARD_PATTERN, REVERSE_PATTERN
-from seqseec.settings import UNSET, get_settings, normalize_layout, normalize_orientation
+from seqseec.settings import SOURCES, TOOLS, UNSET, get_settings, normalize_layout, normalize_orientation
 
 # Plan §5 settings table (paired-end).
 PE_TABLE = {
@@ -54,6 +54,12 @@ def test_library_type_names():
 def test_every_tool_has_a_note():
     for tool in get_settings("RF")["tools"].values():
         assert tool["note"]
+
+
+def test_every_tool_has_a_verification_source():
+    assert set(SOURCES) == set(TOOLS)
+    for url, statement in SOURCES.values():
+        assert url.startswith("https://") and statement
 
 
 @pytest.mark.parametrize("value,expected", [

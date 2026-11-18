@@ -1,7 +1,7 @@
 # File: seqseec/settings.py
-# Version: 0.1.0
+# Version: 0.1.1
 # Last modified: 2026-11-18 (XD)
-# Change: Step 6 lookup table from library orientation and layout to downstream tool settings.
+# Change: Checked every setting against official docs/source; added SOURCES with what each confirms.
 """Step 6: translate a library orientation into downstream tool settings.
 
 This is a fixed lookup table, not an LLM call (plan §3 and §5). Given an
@@ -13,8 +13,9 @@ Orientation conventions (same as seqseec.datacheck):
   RF          read 1 antisense to the transcript     (fr-firststrand; dUTP chemistry)
   UNSTRANDED  no strand information                  (fr-unstranded)
 
-Every value below must be checked against the tool's official documentation
-before v0.3-frozen (plan §5, "verify each item"). Record the check in CHANGELOG.md.
+Every value was checked against the tool's official documentation or source
+code on 2026-11-18 (plan §5, "verify each item"). SOURCES records where each
+check came from. Re-check whenever a tool version changes.
 """
 from seqseec.datacheck import FORWARD_PATTERN, REVERSE_PATTERN
 
@@ -70,9 +71,28 @@ NOTES = {
     "featureCounts": "Option -s of featureCounts (Subread).",
     "HISAT2": "Option --rna-strandness at alignment time.",
     "Salmon": "Library type, option -l of salmon quant. 'A' (auto-detect) is an alternative.",
-    "kallisto": "Option of kallisto quant.",
+    "kallisto": "Option of kallisto quant; with --single it refers to the single read.",
     "HTSeq": "Option -s of htseq-count. Its default is 'yes', so unstranded data needs '-s no' set explicitly.",
     "STAR": "Which column of ReadsPerGene.out.tab (--quantMode GeneCounts) to use.",
+}
+
+
+# Where each row was verified (2026-11-18) and what that source states.
+SOURCES = {
+    "featureCounts": ("https://github.com/ShiLab-Bioinformatics/subread/blob/master/src/readSummary.c",
+                      "usage text: -s 0 (unstranded), 1 (stranded), 2 (reversely stranded); default 0"),
+    "HISAT2": ("https://daehwankimlab.github.io/hisat2/manual/",
+               "--rna-strandness: F/R single-end, FR/RF paired-end; default unstranded; "
+               "fr-firststrand = R/RF, fr-secondstrand = F/FR"),
+    "Salmon": ("https://salmon.readthedocs.io/en/latest/library_type.html",
+               "ISF/ISR/IU paired-end, SF/SR/U single-end; fr-firststrand = ISR/SR, fr-secondstrand = ISF/SF"),
+    "kallisto": ("https://pachterlab.github.io/kallisto/manual",
+                 "--fr-stranded: first read forward; --rf-stranded: first read reverse. The manual does not "
+                 "mention single-end; src/main.cpp of v0.44.0 does not restrict these flags to paired-end"),
+    "HTSeq": ("https://htseq.readthedocs.io/en/latest/htseqcount.html",
+              "-s yes/no/reverse; default yes; yes = read 1 (or single read) on the feature's strand"),
+    "STAR": ("https://github.com/alexdobin/STAR/blob/master/extras/doc-latex/STARmanual.tex",
+             "ReadsPerGene.out.tab: column 2 unstranded, column 3 = htseq-count -s yes, column 4 = -s reverse"),
 }
 
 
