@@ -26,4 +26,6 @@ audit/
 __pycache__/
 *.pyc
 .pytest_cache/
+*.egg-info/
+build/
 .DS_Store
