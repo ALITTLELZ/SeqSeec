@@ -12,7 +12,7 @@ The team plan is in [docs/SeqSeec_Prototype_Plan_EN.pdf](docs/SeqSeec_Prototype_
 |---|---|---|
 | 1–3 Notes → kit → expected orientation (LLM + RAG) | `seqseec/extract.py`, `retrieve.py`, `infer.py` | not started |
 | 4 Local data check | `seqseec/datacheck.py` | **working**: wraps how_are_we_stranded_here; 7/7 smoke tests pass |
-| 5–6 Reconcile, downstream settings | `seqseec/reconcile.py`, `settings.py` | **in review**: decision table and settings lookup with unit tests; settings checked against official tool docs |
+| 5–6 Reconcile, downstream settings | `seqseec/reconcile.py`, `settings.py` | **working**: decision table (incl. out-of-scope) and settings lookup; settings checked against official tool docs |
 | 7 Explanation | `seqseec/explain.py` | not started |
 
 ## Setup

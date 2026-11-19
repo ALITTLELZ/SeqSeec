@@ -2,6 +2,18 @@
 
 Dated record of every change, its reason, and its owner. Newest first.
 
+## 2026-11-19 — step 5 follow-ups from the PR #1 review (XD, branch `fix/reconcile-review-followups`)
+
+Addresses the non-blocking points in ALITTLELZ's review of PR #1.
+
+### Changed
+- **New state `OUT_OF_SCOPE`** (review item 1). A document result of `OUT_OF_SCOPE`, for example Nanopore, PacBio or single-cell notes, now returns this state with no settings, whatever the data says. It used to raise `ValueError`.
+- **`verified_by_data` replaced by `documents_confirmed_by_data`** (review item 2). The new field is True only for CONCORDANT. The old field was also True for CONFLICT and DATA_ONLY, which step 7 could have read as "verified". `settings_basis` still says where the settings come from. **This is an interface change:** code that reads `verified_by_data` must switch to the new field. No code in the repo reads it yet.
+- **Input spelling** (review item 3). Spaces, underscores and hyphens are now interchangeable in document and data labels, so `not_sufficient_information`, `out-of-scope` and `not run` are all accepted.
+- **AMBIGUOUS with a data call** (review item 3). The message now says the reads can be used to choose among the candidate kits, instead of "kit could not be identified".
+- **INSUFFICIENT keeps the data checks** (review item 3). With an INCONCLUSIVE or INVALID data call, the result now includes the same contamination, quality and reference checks as the other states.
+- README status for steps 5–6 updated from "in review" to "working".
+
 ## 2026-11-18 — steps 5–6: reconcile and settings (XD, branch `feat/reconcile-settings`)
 
 ### Added
