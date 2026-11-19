@@ -1,7 +1,7 @@
 # File: seqseec/reconcile.py
-# Version: 0.1.0
-# Last modified: 2026-11-18 (XD)
-# Change: Step 5 decision table reconciling document-inferred and data-observed orientation.
+# Version: 0.2.0
+# Last modified: 2026-11-19 (XD)
+# Change: PR #1 review follow-ups: OUT_OF_SCOPE state; verified_by_data -> documents_confirmed_by_data; looser input spelling; clearer AMBIGUOUS message; checks kept for INSUFFICIENT.
 """Step 5: reconcile what the documents say with what the reads show.
 
 Deterministic decision table from plan §5. Documents show what was *intended*;
@@ -9,6 +9,7 @@ reads show what the files *are*. Neither silently overrides the other.
 
 | Document     | Data                  | State        | Settings                                   |
 |--------------|-----------------------|--------------|--------------------------------------------|
+| OUT_OF_SCOPE | anything              | OUT_OF_SCOPE | none                                       |
 | X            | X                     | CONCORDANT   | from X                                     |
 | X            | other direction       | CONFLICT     | provisional, from data; review required    |
 | X            | INCONCLUSIVE          | INCONCLUSIVE | none                                       |
@@ -18,28 +19,54 @@ reads show what the files *are*. Neither silently overrides the other.
 
 X is FR, RF or UNSTRANDED. AMBIGUOUS from step 3 (candidate kits disagree
 and the notes cannot separate them) is treated as INSUFFICIENT and flagged.
+OUT_OF_SCOPE covers protocols outside plan §2 (e.g. Nanopore, PacBio, single-cell).
+
+Result fields that say how far to trust the settings:
+  settings_basis               "documents and data" | "data" | "documents" | None
+  documents_confirmed_by_data  True only for CONCORDANT: the reads agree with the documents
+  provisional                  settings may change after a person reviews them
+  human_review_required        a person must look before the settings are used
 
 The result holds labels and settings only, with no paths or read data, so it
 can go into the step 7 LLM payload.
 """
+import re
+
 from seqseec.settings import ORIENTATIONS, get_settings, normalize_layout, normalize_orientation
 
-STATES = ("CONCORDANT", "CONFLICT", "INCONCLUSIVE", "UNVERIFIED", "DATA_ONLY", "INSUFFICIENT")
+STATES = ("CONCORDANT", "CONFLICT", "INCONCLUSIVE", "UNVERIFIED", "DATA_ONLY", "INSUFFICIENT", "OUT_OF_SCOPE")
 
 _DOC_NO_ANSWER = {"INSUFFICIENT", "NOT SUFFICIENT INFORMATION", "AMBIGUOUS"}
-_DATA_NO_DIRECTION = {"INCONCLUSIVE", "INVALID", "NOT_RUN"}
+_DOC_OUT_OF_SCOPE = {"OUT OF SCOPE"}
+_DATA_NO_DIRECTION = {"INCONCLUSIVE": "INCONCLUSIVE", "INVALID": "INVALID", "NOT RUN": "NOT_RUN"}
 
 INSUFFICIENT_MESSAGE = "Not sufficient information"
+OUT_OF_SCOPE_MESSAGE = ("The notes describe a protocol outside SeqSeec's scope (Illumina short-read bulk RNA-seq), "
+                        "such as Nanopore, PacBio or single-cell. No settings are given.")
+
+INCONCLUSIVE_CHECKS = [
+    "Check for genomic DNA contamination, which adds reads in both directions.",
+    "Run read quality checks (for example FastQC).",
+    "Confirm that the reference and annotation match the species.",
+]
+INVALID_CHECKS = ["Most reads could not be assigned; check that the reference, annotation and species match."]
+
+
+def _canon(value):
+    """Upper-case and treat spaces, underscores and hyphens alike: 'not_sufficient-information' -> 'NOT SUFFICIENT INFORMATION'."""
+    return re.sub(r"[\s_-]+", " ", str(value).strip().upper())
 
 
 def _document(value):
-    """Return (orientation or "INSUFFICIENT", ambiguous flag)."""
+    """Return (orientation | "INSUFFICIENT" | "OUT_OF_SCOPE", ambiguous flag)."""
     if value is None:
         return "INSUFFICIENT", False
-    key = str(value).strip().upper()
+    key = _canon(value)
+    if key in _DOC_OUT_OF_SCOPE:
+        return "OUT_OF_SCOPE", False
     if key in _DOC_NO_ANSWER:
         return "INSUFFICIENT", key == "AMBIGUOUS"
-    return normalize_orientation(key), False
+    return normalize_orientation(value), False
 
 
 def _data(value):
@@ -49,10 +76,14 @@ def _data(value):
         layout, value = value.get("layout"), value.get("call")
     if value is None:
         return "NOT_RUN", layout
-    key = str(value).strip().upper()
+    key = _canon(value)
     if key in _DATA_NO_DIRECTION:
-        return key, layout
-    return normalize_orientation(key), layout
+        return _DATA_NO_DIRECTION[key], layout
+    return normalize_orientation(value), layout
+
+
+def _no_direction_checks(call):
+    return {"INCONCLUSIVE": INCONCLUSIVE_CHECKS, "INVALID": INVALID_CHECKS}.get(call, [])
 
 
 def _conflict_causes(doc, data):
@@ -77,8 +108,8 @@ def _conflict_causes(doc, data):
 def reconcile(document, data, layout=None):
     """Combine the step 3 document result with the step 4 data result.
 
-    document: "FR" | "RF" | "UNSTRANDED" | "INSUFFICIENT" | "AMBIGUOUS" | None
-              (fr-* library-type names are accepted too)
+    document: "FR" | "RF" | "UNSTRANDED" | "INSUFFICIENT" | "AMBIGUOUS" | "OUT_OF_SCOPE" | None
+              (fr-* library-type names are accepted; spaces, underscores and hyphens are interchangeable)
     data:     "FR" | "RF" | "UNSTRANDED" | "INCONCLUSIVE" | "INVALID" | None (not run),
               or the dict returned by seqseec.datacheck
     layout:   "PE" or "SE"; a layout in the data dict takes precedence; default "PE"
@@ -92,7 +123,10 @@ def reconcile(document, data, layout=None):
     provisional = review = False
     causes, checks = [], []
 
-    if doc_known and data_known and doc == call:
+    if doc == "OUT_OF_SCOPE":
+        state = "OUT_OF_SCOPE"
+        message = OUT_OF_SCOPE_MESSAGE
+    elif doc_known and data_known and doc == call:
         state, orientation, basis = "CONCORDANT", doc, "documents and data"
         message = f"Documents and data agree: {doc}."
     elif doc_known and data_known:
@@ -106,24 +140,24 @@ def reconcile(document, data, layout=None):
     elif doc_known and call == "INCONCLUSIVE":
         state = "INCONCLUSIVE"
         review = True
-        checks = [
-            "Check for genomic DNA contamination, which adds reads in both directions.",
-            "Run read quality checks (for example FastQC).",
-            "Confirm that the reference and annotation match the species.",
-        ]
+        checks = INCONCLUSIVE_CHECKS
         message = (f"Documents indicate {doc}, but the data check is inconclusive (dominant direction between "
                    f"60% and 90%). No settings are given automatically.")
     elif doc_known:  # data INVALID or NOT_RUN
         state, orientation, basis = "UNVERIFIED", doc, "documents"
         provisional = review = True
-        if call == "INVALID":
-            checks = ["Most reads could not be assigned; check that the reference, annotation and species match."]
+        checks = _no_direction_checks(call)
         message = f"Documents indicate {doc}. This has not been verified against the data."
     elif data_known:
         state, orientation, basis = "DATA_ONLY", call, "data"
-        message = f"The reads look {call}. The kit could not be identified from the notes."
+        if ambiguous:
+            message = (f"The notes match several kits that differ in orientation. The reads look {call}, "
+                       f"which can be used to choose among those candidate kits.")
+        else:
+            message = f"The reads look {call}. The kit could not be identified from the notes."
     else:
         state = "INSUFFICIENT"
+        checks = _no_direction_checks(call)
         message = INSUFFICIENT_MESSAGE
 
     return {
@@ -134,11 +168,11 @@ def reconcile(document, data, layout=None):
         "layout": layout,
         "orientation": orientation,
         "settings_basis": basis,
-        "verified_by_data": basis in ("documents and data", "data"),
+        "documents_confirmed_by_data": state == "CONCORDANT",
         "provisional": provisional,
         "human_review_required": review,
         "message": message,
         "likely_causes": causes,
-        "suggested_checks": checks,
+        "suggested_checks": list(checks),
         "settings": get_settings(orientation, layout) if orientation else None,
     }

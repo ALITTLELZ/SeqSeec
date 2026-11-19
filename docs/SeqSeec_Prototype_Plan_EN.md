@@ -1,6 +1,6 @@
 # SeqSeec Prototype Plan
 
-**BIOINF 535 Group Project · Xiaomeng Du, Zhen Liu, Mariam Fateh · Team discussion draft, Nov 8, 2026**
+**BIOINF 535 Group Project · Xiaomeng Du, Zhen Liu, Mariam Fateh · Team discussion draft, Nov 8, 2026 · §4–§5 updated Nov 19, 2026 to match the step 5–6 code**
 
 **Due:** Prototype & Spec Sheet, Mon Nov 16, 2026 (50 pts). Presentation Dec 2 or 9. **Status (Sun Nov 8):** last week's meeting did not happen, and no code or test data exists yet. Work starts Mon Nov 9, which leaves **7 working days**.
 
@@ -78,7 +78,7 @@ Vendor documents rarely state "RF" or "FR" directly, so we use two layers:
 1. Match the alias table to get candidate kits.
 2. Filter by metadata, then run hybrid retrieval.
 3. The LLM picks from the candidates or answers "cannot determine."
-4. If candidates differ in orientation and the notes cannot separate them, code returns `ambiguous` and asks the user.
+4. If candidates differ in orientation and the notes cannot separate them, code returns `ambiguous` and asks the user. If the data check gives a direction, step 5 uses it to choose among the candidates (`DATA_ONLY`).
 
 **Library updates:** new documents must include kit, version, date and source, and must pass a small regression set before activation. The repo stores links and a manifest, not vendor PDFs.
 
@@ -94,22 +94,27 @@ Vendor documents rarely state "RF" or "FR" directly, so we use two layers:
 
 | Document | Data | State | Output |
 |---|---|---|---|
+| Out of scope | Anything | `OUT_OF_SCOPE` | No settings; say the protocol (e.g. Nanopore, PacBio, single-cell) is outside SeqSeec's scope |
 | X | X | `CONCORDANT` | Give settings |
 | X | Opposite direction | `CONFLICT` | **Provisional** settings from data; human review required; list likely causes (version, swapped R1/R2, file mix-up) |
 | Stranded | Unstranded | `CONFLICT` | Same, and flag that the notes may be wrong |
 | Unstranded | Stranded | `CONFLICT` | Same |
 | X | Inconclusive | `INCONCLUSIVE` | No automatic settings; suggest contamination and quality checks |
-| X | Invalid or not run | `UNVERIFIED` | Document result only, marked as not verified by data |
-| Insufficient | Has a result | `DATA_ONLY` | Give direction; state that the kit was not identified |
-| Insufficient | No result | `INSUFFICIENT` | `Not sufficient information` |
+| X | Invalid or not run | `UNVERIFIED` | **Provisional** settings from the documents; human review required; marked as not verified by data |
+| Insufficient or ambiguous | A direction (FR, RF or unstranded) | `DATA_ONLY` | Give settings from data; state that the kit was not identified (if ambiguous: the data can choose among the candidate kits) |
+| Insufficient or ambiguous | No direction (inconclusive, invalid or not run) | `INSUFFICIENT` | `Not sufficient information`; keep the data-check suggestions |
 
-**Settings table** (from prior knowledge; verify each item against official docs during implementation):
+X is FR, RF or unstranded. An `ambiguous` result from step 3 is flagged in the output. Only `CONCORDANT` counts as the documents being confirmed by the data (`documents_confirmed_by_data`); `settings_basis` records whether settings came from documents, data or both.
+
+**Settings table** (each item checked against the tool's official documentation or source code on Nov 18, 2026; sources are recorded in `seqseec/settings.py`):
 
 | Orientation | RSeQC dominant (PE) | featureCounts | HISAT2 | Salmon | kallisto | HTSeq | STAR column |
 |---|---|---|---|---|---|---|---|
 | FR / fr-secondstrand | `1++,1--,2+-,2-+` | `-s 1` | `FR` | `ISF` | `--fr-stranded` | `yes` | 3 |
 | RF / fr-firststrand | `1+-,1-+,2++,2--` | `-s 2` | `RF` | `ISR` | `--rf-stranded` | `reverse` | 4 |
 | Unstranded | About even | `-s 0` | unset | `IU` | default | `no` | 2 |
+
+Single-end reads differ only in RSeQC (`++,--` for FR, `+-,-+` for RF), HISAT2 (`F` / `R`) and Salmon (`SF` / `SR` / `U`). HTSeq defaults to `yes`, so unstranded data needs `no` set explicitly.
 
 ## 6. Testing and evaluation
 
