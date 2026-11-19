@@ -12,11 +12,18 @@ Dated record of every change, its reason, and its owner. Newest first.
   - **Call log:** one line per attempt in `audit/llm_calls.jsonl`, with task, prompt ID and hash, payload hash, requested and returned model IDs, token usage, time and output. The API key is never logged.
   - **Config:** `DEEPSEEK_API_KEY`, `SEQSEEC_LLM_MODEL` (default `deepseek-flash`) and `SEQSEEC_LLM_BASE_URL`, from the environment or `.env`. Standard library only, so no new dependency.
 - `tests/test_llm.py`: fake transport, so no network or key is needed. Covers the request contents, refusals before any request, retries, the key never being logged, and config precedence.
+- `scripts/check_llm_live.py`: one-call live check of the real API with a synthetic note; prints the requested and returned model IDs, token usage and output.
 - README: setup step for `.env` and a status row. Plan §2: module name, current DeepSeek model names, and what each call logs.
 
 ### Note
 - DeepSeek's model names changed since the plan was written (checked 2026-11-19 at api-docs.deepseek.com): `deepseek-flash` is served by DeepSeek-V4.1-Flash-1017, `deepseek-v4-pro` is the larger model, and `deepseek-v4-flash` is a legacy alias.
 - Not yet run against the live API; that needs a key.
+
+### To do: live API check (teammate who holds the DeepSeek API key)
+- [ ] Put `DEEPSEEK_API_KEY=...` in `.env` in the repo root. It is git-ignored; never commit it.
+- [ ] Run `python scripts/check_llm_live.py`. It sends one **synthetic** note, about one cent at most.
+- [ ] Paste its `LIVE CHECK OK` lines (requested and returned model, tokens, output) into the PR or group chat with the date, and tick these boxes in a follow-up commit.
+- If it fails, `audit/llm_calls.jsonl` has the error for each attempt; share that, but not the `.env` file.
 - Built on `feat/payload` (PR #3).
 
 ## 2026-11-19 — LLM payload gate and audit log (XD, branch `feat/payload`)

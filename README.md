@@ -15,7 +15,7 @@ The team plan is in [docs/SeqSeec_Prototype_Plan_EN.pdf](docs/SeqSeec_Prototype_
 | 5–6 Reconcile, downstream settings | `seqseec/reconcile.py`, `settings.py` | **working**: decision table (incl. out-of-scope) and settings lookup; settings checked against official tool docs |
 | 7 Explanation | `seqseec/explain.py` | not started |
 | LLM payload gate + audit log (used by steps 1, 3, 7) | `seqseec/payload.py` | **working**: per-task allow-lists, read/FASTQ/API-key guards, append-only audit log |
-| LLM client (used by steps 1, 3, 7) | `seqseec/llm.py` | **working, untested against the live API**: DeepSeek JSON mode, accepts only `build_payload()` output, retries blank/invalid JSON, logs model ID and usage per call |
+| LLM client (used by steps 1, 3, 7) | `seqseec/llm.py` | **working, untested against the live API** (run `python scripts/check_llm_live.py` with a key; see CHANGELOG to-do): DeepSeek JSON mode, accepts only `build_payload()` output, retries blank/invalid JSON, logs model ID and usage per call |
 
 ## Setup
 
