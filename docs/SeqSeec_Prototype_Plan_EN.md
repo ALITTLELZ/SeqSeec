@@ -1,6 +1,6 @@
 # SeqSeec Prototype Plan
 
-**BIOINF 535 Group Project · Xiaomeng Du, Zhen Liu, Mariam Fateh · Team discussion draft, Nov 8, 2026 · §4–§5 updated Nov 19, 2026 to match the step 5–6 code**
+**BIOINF 535 Group Project · Xiaomeng Du, Zhen Liu, Mariam Fateh · Team discussion draft, Nov 8, 2026 · §3–§5 updated Nov 19, 2026 to match the code**
 
 **Due:** Prototype & Spec Sheet, Mon Nov 16, 2026 (50 pts). Presentation Dec 2 or 9. **Status (Sun Nov 8):** last week's meeting did not happen, and no code or test data exists yet. Work starts Mon Nov 9, which leaves **7 working days**.
 
@@ -57,7 +57,7 @@ FASTQ/BAM ─► 4 Local tools ─► numeric summary only ─► 5 Reconcile (d
 
 - **Step 3 checks (in code):** the chunk exists, the quote appears in that chunk, and the kit is in the registry. Any failure forces `Not sufficient information`.
 - **Step 4 routes:** FASTQ goes to `check_strandedness`; BAM goes to RSeQC `infer_experiment.py`. The LLM has no shell access.
-- **Isolation enforced by code:** an allow-list function builds every LLM payload (notes, public document chunks, numeric summaries). All payloads go to an audit log, and a test asserts that no read sequences appear there.
+- **Isolation enforced by code:** an allow-list function (`seqseec/payload.py`) builds every LLM payload (notes, public document chunks, numeric summaries). Each task may use only its own parts: step 1 notes; step 3 notes, extracted fields and chunks; step 7 fields, inference, data summary, reconciliation result and chunks. Structured parts have key allow-lists, so an unexpected field such as a file path is refused. A run of 30 or more nucleotides, a FASTQ record or an API key blocks the whole payload; chunks from the curated library are exempt from the nucleotide-run check only, because kit manuals quote adapter sequences. All payloads, and every refusal (without the refused content), go to an append-only audit log, and a test asserts that no read sequences appear there.
 - **Tool roles (peer review):** `how_are_we_stranded_here` calls RSeQC internally, so the two are **not independent evidence**. The real cross-check is **documentation vs. data**.
 - **Stack:** Python, ChromaDB with local embeddings, rank_bm25, PyMuPDF, conda `environment.yml`.
 

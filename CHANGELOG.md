@@ -2,6 +2,22 @@
 
 Dated record of every change, its reason, and its owner. Newest first.
 
+## 2026-11-19 — LLM payload gate and audit log (XD, branch `feat/payload`)
+
+### Added
+- `seqseec/payload.py`: `build_payload(task, ...)` is the only way to build input for an LLM call (plan §3).
+  - **Per-task parts:** extract takes notes; infer takes notes, fields and chunks; explain takes fields, inference, data_summary, reconcile and chunks.
+  - **Key allow-lists** for the datacheck summary, the reconcile result and document chunks.
+  - **Content guards:** a run of 30 or more nucleotides, a FASTQ record, an API key, or a string over 50,000 characters refuses the whole payload. Chunks are exempt from the nucleotide-run check only, because kit manuals quote adapters.
+  - **Fails closed** and appends every built or refused payload to `audit/payload_audit.jsonl`. Refusals are logged without the refused content.
+  - `check_audit_log()` re-scans a log.
+- `tests/test_payload.py`: allowed and refused payloads, allow-lists kept in step with `datacheck` and `reconcile`, and the plan §12 check that no read sequences reach the audit log.
+- `.gitignore`: `audit/`. README: status row for the payload gate.
+- `docs/SeqSeec_Prototype_Plan_EN.md` §3: isolation bullet now states the concrete rules above.
+
+### Note
+- This branch is built on `fix/reconcile-review-followups` (PR #2), because the reconcile allow-list uses `documents_confirmed_by_data`.
+
 ## 2026-11-19 — step 5 follow-ups from the PR #1 review (XD, branch `fix/reconcile-review-followups`)
 
 Addresses the non-blocking points in ALITTLELZ's review of PR #1.

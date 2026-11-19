@@ -20,6 +20,7 @@ tests/toy/out/
 *.idx
 kallisto_index*
 stranded_test_*/
+audit/
 
 # Python
 __pycache__/

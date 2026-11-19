@@ -14,6 +14,7 @@ The team plan is in [docs/SeqSeec_Prototype_Plan_EN.pdf](docs/SeqSeec_Prototype_
 | 4 Local data check | `seqseec/datacheck.py` | **working**: wraps how_are_we_stranded_here; 7/7 smoke tests pass |
 | 5–6 Reconcile, downstream settings | `seqseec/reconcile.py`, `settings.py` | **working**: decision table (incl. out-of-scope) and settings lookup; settings checked against official tool docs |
 | 7 Explanation | `seqseec/explain.py` | not started |
+| LLM payload gate + audit log (used by steps 1, 3, 7) | `seqseec/payload.py` | **working**: per-task allow-lists, read/FASTQ/API-key guards, append-only audit log; no LLM calls yet |
 
 ## Setup
 
