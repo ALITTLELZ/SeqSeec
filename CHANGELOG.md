@@ -2,6 +2,23 @@
 
 Dated record of every change, its reason, and its owner. Newest first.
 
+## 2026-11-19 — LLM client (XD, branch `feat/llm`)
+
+### Added
+- `seqseec/llm.py`: `call_llm(built, system_prompt, prompt_id)`, the only code that talks to the LLM (plan §2, "thin interface").
+  - **Payload gate:** sends only a `build_payload()` result and refuses one changed after it was built, by checking the SHA-256.
+  - **JSON mode:** uses DeepSeek's `response_format` json_object. The system prompt must mention JSON, as the API requires, and a `prompt_id` is required so every call traces to a prompt version.
+  - **Retries** once on blank or invalid JSON (a documented JSON-mode failure) and on HTTP 429/5xx. Output cut off at `max_tokens` is not retried.
+  - **Call log:** one line per attempt in `audit/llm_calls.jsonl`, with task, prompt ID and hash, payload hash, requested and returned model IDs, token usage, time and output. The API key is never logged.
+  - **Config:** `DEEPSEEK_API_KEY`, `SEQSEEC_LLM_MODEL` (default `deepseek-flash`) and `SEQSEEC_LLM_BASE_URL`, from the environment or `.env`. Standard library only, so no new dependency.
+- `tests/test_llm.py`: fake transport, so no network or key is needed. Covers the request contents, refusals before any request, retries, the key never being logged, and config precedence.
+- README: setup step for `.env` and a status row. Plan §2: module name, current DeepSeek model names, and what each call logs.
+
+### Note
+- DeepSeek's model names changed since the plan was written (checked 2026-11-19 at api-docs.deepseek.com): `deepseek-flash` is served by DeepSeek-V4.1-Flash-1017, `deepseek-v4-pro` is the larger model, and `deepseek-v4-flash` is a legacy alias.
+- Not yet run against the live API; that needs a key.
+- Built on `feat/payload` (PR #3).
+
 ## 2026-11-19 — LLM payload gate and audit log (XD, branch `feat/payload`)
 
 ### Added
