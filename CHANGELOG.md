@@ -2,6 +2,33 @@
 
 Dated record of every change, its reason, and its owner. Newest first.
 
+## 2026-11-19 — one command, local LLM mode (XD, branch `feat/cli`)
+
+### Added
+- `seqseec/cli.py` and `seqseec/pipeline.py`: `seqseec run` runs every step once and prints one report, as text or `--format json`, and `--out` saves it.
+  - **Step statuses:** each step records `ok`, `skipped`, `given`, `error` or `not_built`. A failed step does not stop the run; it counts as "no answer" in the decision table.
+  - **Placeholders:** steps 2–3 (kit lookup) and 7 (explanation) are `not_built`. Until they exist, `--expected FR|RF|UNSTRANDED` supplies the documents' orientation.
+  - **Reusing a data check:** `--data-call` reuses the result of an earlier data check instead of running the tools.
+  - **Layout:** the reads' layout wins over `--layout`, which wins over the notes, which win over the PE default. A disagreement between notes and reads is reported as a warning.
+  - **Exit codes:** 0 report written; 1 a step failed; 2 bad arguments or setup. API mode with no key stops before any step runs.
+  - **Extending:** to add an option, add it to `pipeline.DEFAULTS` and its argument group in `cli.py`. A test checks that every `run` option has a default.
+  - `seqseec settings <orientation> [--layout SE]` prints the settings table. `python -m seqseec` also works.
+- `pyproject.toml`: `pip install -e .` provides the `seqseec` command. No new dependencies.
+- **`--llm api|local|none`** (`llm.py` 0.2.0):
+  - `local` talks to a model server on this machine through the same OpenAI-style API, by default Ollama at `http://localhost:11434/v1` with model `qwen3.5:2b`. No key is read or sent, and URLs that are not localhost are refused.
+  - The call log records `mode`.
+  - `none` skips the LLM, which gives the no-LLM baseline.
+- `tests/test_pipeline.py`, `tests/test_cli.py`, and local-mode tests in `tests/test_llm.py`. Total 291 tests.
+- README: install, LLM modes, usage. Plan §2: local mode, and "sealed box" with local mode. Plan §3: the command.
+
+### Found in a real local run (laptop, Ollama 0.40.16, `qwen3.5:2b`, synthetic note)
+- Without `reasoning_effort: "none"`, the Qwen3 "thinking" model spent 4 minutes reasoning and hit `max_tokens`, returning no JSON. With it, step 1 took about 28 s. Local mode now sends this field by default; extra fields cannot replace the model, messages or JSON mode.
+- The run kept kit name, strand statement and platform, each with a verified quote. It **dropped `read_layout`**, because the model answered `"2x100"` instead of `PE`. Follow-up to decide: map `2xN` → PE and `1xN` → SE in code, or tighten the prompt.
+
+### To do
+- [ ] Check on Great Lakes: `pip install -e .`, then `python -m pytest -q tests` and `seqseec run --llm none --expected RF --data-call RF`.
+- [ ] Key holder: also try `seqseec run --notes <synthetic note> --data-call RF` (api mode).
+
 ## 2026-11-19 — step 1: field extraction (XD, branch `feat/extract`)
 
 ### Added

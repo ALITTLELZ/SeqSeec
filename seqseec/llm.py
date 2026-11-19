@@ -1,7 +1,7 @@
 # File: seqseec/llm.py
-# Version: 0.1.0
+# Version: 0.2.0
 # Last modified: 2026-11-19 (XD)
-# Change: Thin DeepSeek client (JSON mode) that sends only build_payload() output and logs every call.
+# Change: Add local mode (OpenAI-compatible server on this machine, e.g. Ollama): no API key, loopback host only.
 """The only module that talks to the LLM (plan §2: "a thin LLM interface so the
 model can be swapped later in one place").
 
@@ -16,24 +16,51 @@ call_llm() sends exactly one payload made by seqseec.payload.build_payload():
     and hash, payload hash, requested and returned model IDs, token usage,
     time, and the parsed output. The API key is never logged.
 
+Two modes (both speak the OpenAI-style /chat/completions API, so the code path is the same):
+  api    DeepSeek's hosted API. The notes leave the machine; needs an API key.
+  local  a model server on this machine, e.g. Ollama. Nothing leaves the machine:
+         the base URL must point to localhost (127.0.0.1 / ::1), and no API key is sent.
+
 Configuration (environment variables, or a git-ignored .env file in the working directory):
-  DEEPSEEK_API_KEY       required to make calls
-  SEQSEEC_LLM_MODEL      default "deepseek-flash" (served by DeepSeek-V4.1-Flash-1017 as of 2026-11-19)
-  SEQSEEC_LLM_BASE_URL   default "https://api.deepseek.com" (OpenAI-compatible /chat/completions)
+  api mode:
+    DEEPSEEK_API_KEY        required to make calls
+    SEQSEEC_LLM_MODEL       default "deepseek-flash" (served by DeepSeek-V4.1-Flash-1017 as of 2026-11-19)
+    SEQSEEC_LLM_BASE_URL    default "https://api.deepseek.com"
+  local mode:
+    SEQSEEC_LOCAL_MODEL     default "qwen3.5:2b" (any model pulled into the local server)
+    SEQSEEC_LOCAL_BASE_URL  default "http://localhost:11434/v1" (Ollama's OpenAI-compatible endpoint)
+    Local requests also send reasoning_effort "none": "thinking" models such as Qwen3
+    otherwise spend the whole token budget reasoning and return blank JSON. On
+    2026-11-19, qwen3.5:2b on Ollama 0.40.16 took 4 min and hit max_tokens without it,
+    and answered in about 5 s with it.
 """
 import datetime
 import hashlib
+import ipaddress
 import json
 import os
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
+
+MODES = ("api", "local")
 
 ENV_KEY = "DEEPSEEK_API_KEY"
 ENV_MODEL = "SEQSEEC_LLM_MODEL"
 ENV_BASE_URL = "SEQSEEC_LLM_BASE_URL"
 DEFAULT_MODEL = "deepseek-flash"
 DEFAULT_BASE_URL = "https://api.deepseek.com"
+
+ENV_LOCAL_MODEL = "SEQSEEC_LOCAL_MODEL"
+ENV_LOCAL_BASE_URL = "SEQSEEC_LOCAL_BASE_URL"
+DEFAULT_LOCAL_MODEL = "qwen3.5:2b"
+# Extra request fields for local mode; added only if the body does not already have the key.
+LOCAL_EXTRA_BODY = {"reasoning_effort": "none"}
+DEFAULT_LOCAL_BASE_URL = "http://localhost:11434/v1"
+
+# Local models can take minutes to load on first use.
+DEFAULT_TIMEOUT = {"api": 60, "local": 300}
 DEFAULT_CALL_LOG = os.path.join("audit", "llm_calls.jsonl")
 DEFAULT_MAX_TOKENS = 2000
 DEFAULT_MAX_ATTEMPTS = 2
@@ -68,15 +95,49 @@ def read_env_file(path=".env"):
     return values
 
 
-def get_config(env_file=".env"):
-    """Environment variables win over .env; defaults fill the rest."""
+def get_config(env_file=".env", mode="api"):
+    """Return {"mode", "api_key", "model", "base_url", "timeout"} for mode "api" or "local".
+
+    Environment variables win over .env; defaults fill the rest. Local mode never
+    reads DEEPSEEK_API_KEY, so the hosted key cannot be sent to another server.
+    """
+    if mode not in MODES:
+        raise ValueError(f"LLM mode must be one of {MODES}, not {mode!r}")
     from_file = read_env_file(env_file)
 
     def get(name, default=None):
         return os.environ.get(name) or from_file.get(name) or default
 
-    return {"api_key": get(ENV_KEY), "model": get(ENV_MODEL, DEFAULT_MODEL),
-            "base_url": get(ENV_BASE_URL, DEFAULT_BASE_URL).rstrip("/")}
+    if mode == "local":
+        return {"mode": "local", "api_key": None, "model": get(ENV_LOCAL_MODEL, DEFAULT_LOCAL_MODEL),
+                "base_url": get(ENV_LOCAL_BASE_URL, DEFAULT_LOCAL_BASE_URL).rstrip("/"),
+                "timeout": DEFAULT_TIMEOUT["local"], "extra_body": dict(LOCAL_EXTRA_BODY)}
+    return {"mode": "api", "api_key": get(ENV_KEY), "model": get(ENV_MODEL, DEFAULT_MODEL),
+            "base_url": get(ENV_BASE_URL, DEFAULT_BASE_URL).rstrip("/"), "timeout": DEFAULT_TIMEOUT["api"]}
+
+
+def is_loopback_url(url):
+    """True if url points to this machine (localhost, 127.0.0.0/8 or ::1)."""
+    host = urllib.parse.urlsplit(url).hostname or ""
+    if host == "localhost":
+        return True
+    try:
+        return ipaddress.ip_address(host).is_loopback
+    except ValueError:
+        return False
+
+
+def check_config(config):
+    """Raise LLMError if config cannot make a call; no request is sent. Returns the mode."""
+    mode = config.get("mode", "api")
+    if mode not in MODES:
+        raise LLMError(f"LLM mode must be one of {MODES}, not {mode!r}")
+    if mode == "api" and not config.get("api_key"):
+        raise LLMError(f"no API key: set {ENV_KEY} in the environment or in .env")
+    if mode == "local" and not is_loopback_url(config.get("base_url", "")):
+        raise LLMError(f"local mode only talks to a server on this machine; {config.get('base_url')!r} "
+                       f"is not localhost. Use api mode for a remote server.")
+    return mode
 
 
 # ---------- transport ----------
@@ -150,12 +211,14 @@ def _log(path, record):
 # ---------- public API ----------
 
 def call_llm(built, system_prompt, prompt_id, *, config=None, transport=http_post, call_log=DEFAULT_CALL_LOG,
-             temperature=0.0, max_tokens=DEFAULT_MAX_TOKENS, max_attempts=DEFAULT_MAX_ATTEMPTS, timeout=60):
+             temperature=0.0, max_tokens=DEFAULT_MAX_TOKENS, max_attempts=DEFAULT_MAX_ATTEMPTS, timeout=None):
     """Send one built payload to the LLM and return {"output": dict, "record": dict}.
 
     built:         return value of seqseec.payload.build_payload()
     system_prompt: prompt text; must mention JSON
     prompt_id:     version label of the prompt, e.g. "infer_v2" (plan §8: prompts are versioned)
+    config:        from get_config(); default get_config() (api mode)
+    timeout:       seconds per attempt; default from config (60 api, 300 local)
     Raises LLMError on failure, after logging each attempt.
     """
     _verify_built(built)
@@ -164,11 +227,13 @@ def call_llm(built, system_prompt, prompt_id, *, config=None, transport=http_pos
     if not prompt_id:
         raise LLMError("prompt_id is required so every call can be traced to a prompt version")
     config = config or get_config()
-    if not config.get("api_key"):
-        raise LLMError(f"no API key: set {ENV_KEY} in the environment or in .env")
+    mode = check_config(config)
+    timeout = timeout or config.get("timeout") or DEFAULT_TIMEOUT[mode]
 
     url = f"{config['base_url']}/chat/completions"
-    headers = {"Authorization": f"Bearer {config['api_key']}", "Content-Type": "application/json"}
+    headers = {"Content-Type": "application/json"}
+    if config.get("api_key"):
+        headers["Authorization"] = f"Bearer {config['api_key']}"
     body = {
         "model": config["model"],
         "messages": [{"role": "system", "content": system_prompt},
@@ -178,9 +243,12 @@ def call_llm(built, system_prompt, prompt_id, *, config=None, transport=http_pos
         "max_tokens": max_tokens,
         "stream": False,
     }
+    for key, value in (config.get("extra_body") or {}).items():
+        body.setdefault(key, value)  # cannot replace the model, messages or JSON mode
     base = {"task": built["payload"]["task"], "payload_sha256": built["sha256"], "prompt_id": prompt_id,
-            "prompt_sha256": _sha256(system_prompt), "requested_model": config["model"],
-            "base_url": config["base_url"], "temperature": temperature, "max_tokens": max_tokens}
+            "prompt_sha256": _sha256(system_prompt), "mode": mode, "requested_model": config["model"],
+            "base_url": config["base_url"], "temperature": temperature, "max_tokens": max_tokens,
+            "extra_body": config.get("extra_body")}
 
     for attempt in range(1, max_attempts + 1):
         start = time.monotonic()

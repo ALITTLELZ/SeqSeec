@@ -1,12 +1,13 @@
 # File: tests/test_llm.py
-# Version: 0.1.0
+# Version: 0.2.0
 # Last modified: 2026-11-19 (XD)
-# Change: Tests for the LLM client with a fake transport (no network, no API key needed).
+# Change: Add local-mode tests: no key needed or sent, loopback host only, mode in config and log.
 import json
 
 import pytest
 
-from seqseec.llm import DEFAULT_BASE_URL, DEFAULT_MODEL, LLMError, call_llm, get_config, read_env_file
+from seqseec.llm import (DEFAULT_BASE_URL, DEFAULT_LOCAL_BASE_URL, DEFAULT_LOCAL_MODEL, DEFAULT_MODEL, LLMError,
+                         call_llm, get_config, is_loopback_url, read_env_file)
 from seqseec.payload import build_payload
 
 KEY = "sk-test" + "0123456789abcdef"
@@ -176,10 +177,78 @@ def test_config_defaults_and_precedence(tmp_path, monkeypatch):
         monkeypatch.delenv(name, raising=False)
     env = tmp_path / ".env"
     env.write_text("DEEPSEEK_API_KEY=from-file\nSEQSEEC_LLM_MODEL=deepseek-v4-pro\n")
-    assert get_config(str(tmp_path / "none.env")) == {"api_key": None, "model": DEFAULT_MODEL,
-                                                      "base_url": DEFAULT_BASE_URL}
+    assert get_config(str(tmp_path / "none.env")) == {"mode": "api", "api_key": None, "model": DEFAULT_MODEL,
+                                                      "base_url": DEFAULT_BASE_URL, "timeout": 60}
     assert get_config(str(env))["api_key"] == "from-file"
     monkeypatch.setenv("SEQSEEC_LLM_MODEL", "deepseek-flash")
     monkeypatch.setenv("SEQSEEC_LLM_BASE_URL", "https://proxy.test/")
     cfg = get_config(str(env))
     assert cfg["model"] == "deepseek-flash" and cfg["base_url"] == "https://proxy.test"
+
+
+# ---------- local mode ----------
+
+LOCAL = {"mode": "local", "api_key": None, "model": "qwen3.5:2b", "base_url": "http://localhost:11434/v1",
+         "extra_body": {"reasoning_effort": "none"}}
+
+
+def test_local_config_ignores_hosted_key(tmp_path, monkeypatch):
+    for name in ("SEQSEEC_LOCAL_MODEL", "SEQSEEC_LOCAL_BASE_URL"):
+        monkeypatch.delenv(name, raising=False)
+    monkeypatch.setenv("DEEPSEEK_API_KEY", KEY)
+    cfg = get_config(str(tmp_path / "none.env"), mode="local")
+    assert cfg == {"mode": "local", "api_key": None, "model": DEFAULT_LOCAL_MODEL,
+                   "base_url": DEFAULT_LOCAL_BASE_URL, "timeout": 300,
+                   "extra_body": {"reasoning_effort": "none"}}
+    monkeypatch.setenv("SEQSEEC_LOCAL_MODEL", "llama3.1:8b")
+    assert get_config(str(tmp_path / "none.env"), mode="local")["model"] == "llama3.1:8b"
+
+
+def test_unknown_mode_rejected():
+    with pytest.raises(ValueError):
+        get_config(mode="cloud")
+
+
+def test_local_call_needs_no_key_and_sends_none(built, paths):
+    fake = FakeTransport(response())
+    out = call_llm(built, PROMPT, "extract_v1", config=LOCAL, transport=fake, call_log=paths["calls"])
+    req = fake.requests[0]
+    assert req["url"] == "http://localhost:11434/v1/chat/completions"
+    assert "Authorization" not in req["headers"]
+    assert req["body"]["response_format"] == {"type": "json_object"}
+    assert req["body"]["reasoning_effort"] == "none"
+    assert out["record"]["mode"] == "local" and log_lines(paths["calls"])[0]["mode"] == "local"
+
+
+@pytest.mark.parametrize("url,ok", [("http://localhost:11434/v1", True), ("http://127.0.0.1:8080/v1", True),
+                                    ("http://[::1]:11434/v1", True), ("https://api.deepseek.com", False),
+                                    ("http://gl-node12:11434/v1", False), ("http://localhost.evil.test/v1", False)])
+def test_loopback_check(url, ok):
+    assert is_loopback_url(url) is ok
+
+
+def test_local_mode_refuses_remote_server(built, paths):
+    fake = FakeTransport()
+    with pytest.raises(LLMError, match="not localhost"):
+        call_llm(built, PROMPT, "extract_v1", config={**LOCAL, "base_url": "https://api.deepseek.com"},
+                 transport=fake, call_log=paths["calls"])
+    assert fake.requests == []
+
+
+def test_api_mode_logged(built, paths):
+    assert call(built, paths, FakeTransport(response()))["record"]["mode"] == "api"
+
+
+def test_extra_body_cannot_override_fixed_fields(built, paths):
+    fake = FakeTransport(response())
+    sneaky = {**LOCAL, "extra_body": {"model": "other", "response_format": {"type": "text"}, "top_p": 0.5}}
+    call_llm(built, PROMPT, "extract_v1", config=sneaky, transport=fake, call_log=paths["calls"])
+    body = fake.requests[0]["body"]
+    assert body["model"] == "qwen3.5:2b" and body["response_format"] == {"type": "json_object"}
+    assert body["top_p"] == 0.5
+
+
+def test_api_mode_sends_no_extra_fields(built, paths):
+    fake = FakeTransport(response())
+    call(built, paths, fake)
+    assert "reasoning_effort" not in fake.requests[0]["body"]

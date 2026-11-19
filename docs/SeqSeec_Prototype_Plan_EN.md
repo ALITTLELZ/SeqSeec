@@ -28,11 +28,11 @@ SeqSeec is the **reverse of last year's CmdSmith**.
   - The model name is set with `SEQSEEC_LLM_MODEL`. The default is `deepseek-flash`, which DeepSeek served with DeepSeek-V4.1-Flash-1017 as of Nov 19, 2026; `deepseek-v4-pro` is the larger option. The key is `DEEPSEEK_API_KEY` in `.env`.
   - Every call uses JSON mode and sends only a payload built by `payload.py`. Each attempt is logged to `audit/llm_calls.jsonl` with the requested and returned model IDs, the prompt ID and hash, the payload hash and token usage, which gives the model ID and date to report.
 - With a third-party API, notes leave the machine. So the prototype uses **public or synthetic notes only**, and the spec sheet says so.
-- A local model (Ollama) is future work only; with the shortened timeline we drop the comparison experiment.
+- **Local mode (added Nov 19, not yet evaluated):** `seqseec run --llm local` sends the same payloads and prompts to a model server on the same machine (Ollama's OpenAI-compatible endpoint). No API key is used, and `llm.py` refuses any URL that is not localhost, so the notes stay on the machine too. Local requests send `reasoning_effort: "none"` so that "thinking" models answer in JSON instead of using up the token budget. It has had one laptop run (`qwen3.5:2b`, synthetic note, about 28 s). Whether to evaluate the API against the local model is a team decision; the API remains the plan's default. `--llm none` turns the LLM off (no-LLM baseline).
 
 **Claude Science: not part of the system.** It has no API and is chat-only. We can use it as a development Q&A helper, but not in the pipeline or the formal evaluation. Any fact from it must be verified against vendor documents before entering our registry.
 
-**Redefining "sealed-box"** (instructor's request): reads never leave the machine; notes and numeric tool summaries do go to the LLM. We drop the "offline LLM" wording.
+**Redefining "sealed-box"** (instructor's request): reads never leave the machine; with the API, notes and numeric tool summaries do go to the LLM. We drop the "offline LLM" wording for the API mode; with `--llm local` nothing leaves the machine.
 
 **Scope:** Illumina paired-end short-read bulk RNA-seq, human and mouse, 6–8 kits. Nanopore, PacBio and single-cell return "out of scope."
 
@@ -62,6 +62,7 @@ FASTQ/BAM ─► 4 Local tools ─► numeric summary only ─► 5 Reconcile (d
 - **Step 4 routes:** FASTQ goes to `check_strandedness`; BAM goes to RSeQC `infer_experiment.py`. The LLM has no shell access.
 - **Isolation enforced by code:** an allow-list function (`seqseec/payload.py`) builds every LLM payload (notes, public document chunks, numeric summaries). Each task may use only its own parts: step 1 notes; step 3 notes, extracted fields and chunks; step 7 fields, inference, data summary, reconciliation result and chunks. Structured parts have key allow-lists, so an unexpected field such as a file path is refused. A run of 30 or more nucleotides, a FASTQ record or an API key blocks the whole payload; chunks from the curated library are exempt from the nucleotide-run check only, because kit manuals quote adapter sequences. All payloads, and every refusal (without the refused content), go to an append-only audit log, and a test asserts that no read sequences appear there.
 - **Tool roles (peer review):** `how_are_we_stranded_here` calls RSeQC internally, so the two are **not independent evidence**. The real cross-check is **documentation vs. data**.
+- **One command (`seqseec/cli.py`, `seqseec/pipeline.py`):** `seqseec run --notes … [--r1 … --r2 … --gtf … --transcripts …] [--llm api|local|none]` runs steps 1–7 in order and prints one report (text or JSON). A failed step is recorded and treated as "no answer", so the decision table still runs. Steps 2–3 and 7 are placeholders until built; meanwhile `--expected` gives the documents' orientation and `--data-call` reuses an earlier data check.
 - **Stack:** Python, ChromaDB with local embeddings, rank_bm25, PyMuPDF, conda `environment.yml`.
 
 ## 4. Reference library
