@@ -2,6 +2,27 @@
 
 Dated record of every change, its reason, and its owner. Newest first.
 
+## 2026-11-19 — step 1: field extraction (XD, branch `feat/extract`)
+
+### Added
+- `prompts/extract_v1.md`: the first versioned prompt. It covers ten fields: kit name, version, vendor, chemistry, strand statement, RNA selection, read layout, platform, library type and organism. Each non-null field must carry a verbatim quote, the notes are treated as data, and the answer is a fixed JSON format with an example.
+- `seqseec/extract.py`: `extract(notes)` runs `build_payload` → `call_llm` → `interpret()`. `interpret()` is pure code.
+  - **Quote check:** a field whose quote does not appear verbatim in the notes is dropped and listed in `rejected`. Matching ignores case, spacing and curly quotes.
+  - **Allowed values** are enforced for `read_layout`, `rna_selection` and `library_type`.
+  - **Scope** is decided by code from the checked platform, library type and kit name: Nanopore, PacBio and single-cell are `OUT_OF_SCOPE`. Organisms other than human and mouse get a warning.
+  - **Follow-up questions** are written by code when the kit, its version or the read layout is missing.
+- `tests/test_extract.py`: quote checks, allowed values, scope, questions, the prompt file, and a check that the prompt's own example passes the code's checks. End-to-end runs use a fake API.
+- Plan §3: step 1 checks bullet. Plan §8: prompt-file header convention. README: step 1 status row, and `prompts/` and `scripts/` in the layout.
+
+- `scripts/check_llm_live.py --extract`: also runs step 1 live on the same synthetic note.
+
+### Note
+- Built on `feat/llm`. Not yet run against the live API.
+
+### To do: step 1 live check (teammate who holds the DeepSeek API key)
+- [ ] With the key in `.env`, run `python scripts/check_llm_live.py --extract` (two calls in total).
+- [ ] Expected: `kit_name` "NEBNext Ultra II Directional RNA Library Prep Kit", `read_layout` "PE", `rna_selection` "polyA", `rejected` empty, scope `IN_SCOPE`, and one question asking for the kit version. Paste the output into the PR or group chat with the date. Anything in `rejected` means the prompt needs work.
+
 ## 2026-11-19 — LLM client (XD, branch `feat/llm`)
 
 ### Added
