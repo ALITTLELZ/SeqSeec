@@ -1,0 +1,202 @@
+{
+  "seqseec_version": "0.1.0",
+  "llm": {
+    "mode": "api",
+    "model": "deepseek-flash"
+  },
+  "steps": {
+    "extract": {
+      "status": "ok",
+      "fields": {
+        "kit_name": "NEBNext Ultra II kit",
+        "kit_version": null,
+        "vendor": null,
+        "chemistry": null,
+        "strand_statement": null,
+        "rna_selection": null,
+        "read_layout": "SE",
+        "platform": null,
+        "library_type": null,
+        "organism": null
+      },
+      "evidence": {
+        "kit_name": "NEBNext Ultra II kit",
+        "read_layout": "single-end"
+      },
+      "rejected": [],
+      "scope": "IN_SCOPE",
+      "scope_reason": null,
+      "warnings": [],
+      "questions": [
+        "Which version of NEBNext Ultra II kit was used? Some kits changed read orientation between versions."
+      ],
+      "llm": {
+        "prompt_id": "extract_v1",
+        "payload_sha256": "22fcf8b4315b26184583e69dff4f843940373a3e079027bd8e26c204e8474369",
+        "requested_model": "deepseek-flash",
+        "response_model": "deepseek-flash",
+        "attempt": 1
+      }
+    },
+    "lookup": {
+      "status": "ok",
+      "document_orientation": "AMBIGUOUS",
+      "decision": "AMBIGUOUS",
+      "kit_id": null,
+      "kit_name": null,
+      "evidence_type": null,
+      "source_url": null,
+      "notes_quote": null,
+      "citation": null,
+      "candidates": [
+        {
+          "kit_id": "nebnext_ultra2_directional",
+          "matched_by": "alias",
+          "alias": "NEBNext Ultra II",
+          "orientation": "RF",
+          "evidence": "inferred_from_chemistry",
+          "kind": "kit"
+        },
+        {
+          "kit_id": "nebnext_ultra2_nondirectional",
+          "matched_by": "alias",
+          "alias": "NEBNext Ultra II",
+          "orientation": "UNSTRANDED",
+          "evidence": "explicit",
+          "kind": "kit"
+        }
+      ],
+      "retrieval_method": "alias",
+      "rejected": [],
+      "reason": "The notes name only the NEBNext Ultra II kit family without specifying Directional, and both directional and non-directional candidates match.",
+      "rules_orientation": "AMBIGUOUS",
+      "llm": {
+        "prompt_id": "infer_v1",
+        "payload_sha256": "bb6f1857430aa004e2412c7c2ba3d40c303079fbb0150ff4c0dba1dfa6a04d5c",
+        "requested_model": "deepseek-flash",
+        "response_model": "deepseek-flash",
+        "attempt": 1
+      }
+    },
+    "datacheck": {
+      "status": "ok",
+      "result": {
+        "layout": "SE",
+        "failed_fraction": 0.0,
+        "forward_fraction": 1.0,
+        "reverse_fraction": 0.0,
+        "forward_share": 1.0,
+        "reverse_share": 0.0,
+        "call": "FR",
+        "reason": "Over 90% of assignable reads have read 1 on the transcript strand.",
+        "tool": "how_are_we_stranded_here@e6ce74d",
+        "nreads_requested": 200000
+      }
+    },
+    "reconcile": {
+      "status": "ok",
+      "state": "DATA_ONLY",
+      "document_orientation": "INSUFFICIENT",
+      "document_ambiguous": true,
+      "data_call": "FR",
+      "layout": "SE",
+      "orientation": "FR",
+      "settings_basis": "data",
+      "documents_confirmed_by_data": false,
+      "provisional": false,
+      "human_review_required": false,
+      "message": "The notes match several kits that differ in orientation. The reads look FR, which can be used to choose among those candidate kits.",
+      "likely_causes": [],
+      "suggested_checks": [],
+      "settings": {
+        "orientation": "FR",
+        "layout": "SE",
+        "library_type": "fr-secondstrand",
+        "rseqc_dominant": "++,--",
+        "tools": {
+          "featureCounts": {
+            "setting": "-s 1",
+            "note": "Option -s of featureCounts (Subread)."
+          },
+          "HISAT2": {
+            "setting": "--rna-strandness F",
+            "note": "Option --rna-strandness at alignment time."
+          },
+          "Salmon": {
+            "setting": "-l SF",
+            "note": "Library type, option -l of salmon quant. 'A' (auto-detect) is an alternative."
+          },
+          "kallisto": {
+            "setting": "--fr-stranded",
+            "note": "Option of kallisto quant; with --single it refers to the single read."
+          },
+          "HTSeq": {
+            "setting": "-s yes",
+            "note": "Option -s of htseq-count. Its default is 'yes', so unstranded data needs '-s no' set explicitly."
+          },
+          "STAR": {
+            "setting": "ReadsPerGene.out.tab column 3",
+            "note": "Which column of ReadsPerGene.out.tab (--quantMode GeneCounts) to use."
+          }
+        }
+      }
+    },
+    "explain": {
+      "status": "not_built",
+      "reason": "Step 7 (plain-language explanation) is not built yet."
+    }
+  },
+  "warnings": [],
+  "result": {
+    "state": "DATA_ONLY",
+    "document_orientation": "INSUFFICIENT",
+    "document_ambiguous": true,
+    "data_call": "FR",
+    "layout": "SE",
+    "orientation": "FR",
+    "settings_basis": "data",
+    "documents_confirmed_by_data": false,
+    "provisional": false,
+    "human_review_required": false,
+    "message": "The notes match several kits that differ in orientation. The reads look FR, which can be used to choose among those candidate kits.",
+    "likely_causes": [],
+    "suggested_checks": [],
+    "settings": {
+      "orientation": "FR",
+      "layout": "SE",
+      "library_type": "fr-secondstrand",
+      "rseqc_dominant": "++,--",
+      "tools": {
+        "featureCounts": {
+          "setting": "-s 1",
+          "note": "Option -s of featureCounts (Subread)."
+        },
+        "HISAT2": {
+          "setting": "--rna-strandness F",
+          "note": "Option --rna-strandness at alignment time."
+        },
+        "Salmon": {
+          "setting": "-l SF",
+          "note": "Library type, option -l of salmon quant. 'A' (auto-detect) is an alternative."
+        },
+        "kallisto": {
+          "setting": "--fr-stranded",
+          "note": "Option of kallisto quant; with --single it refers to the single read."
+        },
+        "HTSeq": {
+          "setting": "-s yes",
+          "note": "Option -s of htseq-count. Its default is 'yes', so unstranded data needs '-s no' set explicitly."
+        },
+        "STAR": {
+          "setting": "ReadsPerGene.out.tab column 3",
+          "note": "Which column of ReadsPerGene.out.tab (--quantMode GeneCounts) to use."
+        }
+      }
+    }
+  },
+  "questions": [
+    "Which version of NEBNext Ultra II kit was used? Some kits changed read orientation between versions."
+  ],
+  "errors": [],
+  "ok": true
+}

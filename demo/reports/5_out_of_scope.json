@@ -1,0 +1,89 @@
+{
+  "seqseec_version": "0.1.0",
+  "llm": {
+    "mode": "api",
+    "model": "deepseek-flash"
+  },
+  "steps": {
+    "extract": {
+      "status": "ok",
+      "fields": {
+        "kit_name": null,
+        "kit_version": null,
+        "vendor": null,
+        "chemistry": null,
+        "strand_statement": null,
+        "rna_selection": null,
+        "read_layout": null,
+        "platform": "Oxford Nanopore PromethION",
+        "library_type": null,
+        "organism": null
+      },
+      "evidence": {
+        "platform": "Oxford Nanopore PromethION"
+      },
+      "rejected": [],
+      "scope": "OUT_OF_SCOPE",
+      "scope_reason": "long-read platform (Oxford Nanopore PromethION)",
+      "warnings": [],
+      "questions": [],
+      "llm": {
+        "prompt_id": "extract_v1",
+        "payload_sha256": "35011ec4a494934a7feff575dedc1094d2c21027e9421bac0daebcbe3c8f6c33",
+        "requested_model": "deepseek-flash",
+        "response_model": "deepseek-flash",
+        "attempt": 1
+      }
+    },
+    "lookup": {
+      "status": "out_of_scope",
+      "document_orientation": "OUT_OF_SCOPE",
+      "reason": "long-read platform (Oxford Nanopore PromethION)"
+    },
+    "datacheck": {
+      "status": "skipped",
+      "reason": "no reads given"
+    },
+    "reconcile": {
+      "status": "ok",
+      "state": "OUT_OF_SCOPE",
+      "document_orientation": "OUT_OF_SCOPE",
+      "document_ambiguous": false,
+      "data_call": "NOT_RUN",
+      "layout": "PE",
+      "orientation": null,
+      "settings_basis": null,
+      "documents_confirmed_by_data": false,
+      "provisional": false,
+      "human_review_required": false,
+      "message": "The notes describe a protocol outside SeqSeec's scope (Illumina short-read bulk RNA-seq), such as Nanopore, PacBio or single-cell. No settings are given.",
+      "likely_causes": [],
+      "suggested_checks": [],
+      "settings": null
+    },
+    "explain": {
+      "status": "not_built",
+      "reason": "Step 7 (plain-language explanation) is not built yet."
+    }
+  },
+  "warnings": [],
+  "result": {
+    "state": "OUT_OF_SCOPE",
+    "document_orientation": "OUT_OF_SCOPE",
+    "document_ambiguous": false,
+    "data_call": "NOT_RUN",
+    "layout": "PE",
+    "orientation": null,
+    "settings_basis": null,
+    "documents_confirmed_by_data": false,
+    "provisional": false,
+    "human_review_required": false,
+    "message": "The notes describe a protocol outside SeqSeec's scope (Illumina short-read bulk RNA-seq), such as Nanopore, PacBio or single-cell. No settings are given.",
+    "likely_causes": [],
+    "suggested_checks": [],
+    "settings": null
+  },
+  "questions": [],
+  "errors": [],
+  "ok": true
+}

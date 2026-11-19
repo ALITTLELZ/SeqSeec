@@ -1,0 +1,233 @@
+<title>SeqSeec Replay</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one reading column; a step strip, a case switcher, then notes|result side by side, evaluation below. */
+:root {
+  --paper: #f5f7f6; --card: #ffffff; --ink: #17201e; --muted: #5a6864; --line: #d6dedb;
+  --accent: #0d7466; --accent-soft: #dcefeb;
+  --ok: #1f7a3d; --ok-soft: #e1f2e6; --bad: #b4372a; --bad-soft: #f8e3df;
+  --warn: #946100; --warn-soft: #f6ecd2; --info: #2c5f9e; --info-soft: #e1eaf6; --none: #66706d; --none-soft: #e9edec;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #0f1514; --card: #161e1c; --ink: #e3ebe8; --muted: #9aaaa5; --line: #2a3633;
+  --accent: #4fc2b0; --accent-soft: #173a35;
+  --ok: #6cc98a; --ok-soft: #173323; --bad: #f08a7c; --bad-soft: #3d1d19; --warn: #e2b55a; --warn-soft: #3a2e14;
+  --info: #8db6ef; --info-soft: #1b2b42; --none: #9aa5a2; --none-soft: #222b29; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #0f1514; --card: #161e1c; --ink: #e3ebe8; --muted: #9aaaa5; --line: #2a3633;
+  --accent: #4fc2b0; --accent-soft: #173a35;
+  --ok: #6cc98a; --ok-soft: #173323; --bad: #f08a7c; --bad-soft: #3d1d19; --warn: #e2b55a; --warn-soft: #3a2e14;
+  --info: #8db6ef; --info-soft: #1b2b42; --none: #9aa5a2; --none-soft: #222b29; color-scheme: dark }
+
+* { box-sizing: border-box; }
+body { background: var(--paper); color: var(--ink); font: 15px/1.55 var(--sans); }
+.wrap { max-width: 1080px; margin: 0 auto; padding-block: 28px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 28px; }
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+h1 { font-size: 30px; font-weight: 700; letter-spacing: -0.01em; }
+h2 { font-size: 20px; font-weight: 600; }
+h3 { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+p { margin: 0; max-width: 68ch; }
+a { color: var(--accent); }
+code, .mono { font-family: var(--mono); font-size: 0.9em; }
+.lede { color: var(--muted); }
+header { display: grid; gap: 10px; }
+.replay-note { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; font-size: 13.5px;
+  border: 1px solid var(--line); border-radius: 6px; padding: 8px 12px; background: var(--card); color: var(--muted); }
+.replay-note strong { color: var(--ink); }
+
+/* step strip */
+.steps { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+.step { border: 1px solid var(--line); border-radius: 6px; padding: 8px 8px 9px; background: var(--card); min-width: 0; }
+.step .n { font: 500 11px var(--mono); color: var(--muted); }
+.step .t { font-size: 13px; font-weight: 600; line-height: 1.3; }
+.step .s { font: 11.5px var(--mono); margin-top: 4px; }
+.step.ok .s, .step.given .s { color: var(--ok); }
+.step.error .s { color: var(--bad); }
+.step.skipped .s, .step.not_built .s, .step.out_of_scope .s { color: var(--none); }
+@media (max-width: 760px) {
+  .steps { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .step { display: grid; grid-template-columns: 4.5em minmax(0, 1fr) auto; align-items: baseline; gap: 8px; padding: 5px 10px; }
+  .step .s { margin-top: 0; }
+}
+
+/* case switcher */
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+.tab { font: 500 14px var(--sans); color: var(--ink); background: var(--card); border: 1px solid var(--line);
+  border-radius: 999px; padding: 6px 14px; cursor: pointer; }
+.tab:hover { border-color: var(--accent); }
+.tab[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: var(--card); }
+.tab:focus-visible, button:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.blurb { color: var(--muted); margin-top: -12px; }
+
+.case { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 20px; align-items: start; }
+@media (max-width: 860px) { .case { grid-template-columns: minmax(0, 1fr); } }
+.panel { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 18px; display: grid; gap: 14px; min-width: 0; }
+.notes { font-size: 14.5px; border-left: 3px solid var(--line); padding-left: 12px; color: var(--ink); }
+dl.kv { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 14px; margin: 0; font-size: 14px; }
+dl.kv dt { color: var(--muted); font-family: var(--mono); font-size: 12.5px; padding-top: 1px; }
+dl.kv dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.quote { color: var(--muted); font-size: 13px; }
+.vendor { border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; font-size: 13.5px; display: grid; gap: 6px; }
+.chip { display: inline-block; font: 500 11.5px var(--mono); padding: 1px 7px; border-radius: 4px; background: var(--none-soft); color: var(--none); }
+.chip.explicit { background: var(--ok-soft); color: var(--ok); }
+.chip.inferred_from_chemistry { background: var(--warn-soft); color: var(--warn); }
+
+.state { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.pill { font: 600 14px var(--mono); letter-spacing: 0.02em; padding: 4px 10px; border-radius: 5px; }
+.pill.CONCORDANT { background: var(--ok-soft); color: var(--ok); }
+.pill.CONFLICT { background: var(--bad-soft); color: var(--bad); }
+.pill.INCONCLUSIVE, .pill.UNVERIFIED { background: var(--warn-soft); color: var(--warn); }
+.pill.DATA_ONLY { background: var(--info-soft); color: var(--info); }
+.pill.INSUFFICIENT, .pill.OUT_OF_SCOPE { background: var(--none-soft); color: var(--none); }
+.flag { font: 500 12px var(--mono); color: var(--warn); }
+.evidence-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.ev { border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; min-width: 0; }
+.ev .l { font-size: 11.5px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.ev .v { font: 600 15px var(--mono); }
+.bar { display: flex; height: 10px; border-radius: 3px; overflow: hidden; background: var(--none-soft); }
+.bar .f { background: var(--info); } .bar .r { background: var(--accent); }
+.legend { display: flex; justify-content: space-between; font: 12px var(--mono); color: var(--muted); gap: 8px; flex-wrap: wrap; }
+ul.plain { margin: 0; padding-left: 18px; display: grid; gap: 3px; font-size: 14px; }
+.tablebox { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 12px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+td.mono { font-family: var(--mono); font-size: 12.5px; }
+td.hit { color: var(--ok); } td.miss { color: var(--bad); font-weight: 600; }
+.muted { color: var(--muted); }
+section { display: grid; gap: 14px; }
+footer { color: var(--muted); font-size: 13px; display: grid; gap: 6px; border-top: 1px solid var(--line); padding-top: 16px; }
+@media (prefers-reduced-motion: no-preference) { .case { animation: fade .18s ease-out; } @keyframes fade { from { opacity: .4 } to { opacity: 1 } } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>SeqSeec</h1>
+    <p class="lede">Works out whether an RNA-seq library is stranded, and which way, from the lab notes and a local check of the reads. It then gives the matching settings for featureCounts, Salmon, HISAT2 and other tools. Built for analysts who know the computing side better than the bench.</p>
+    <div class="replay-note"><strong>Replay of saved runs.</strong><span id="replay-meta"></span></div>
+  </header>
+
+  <section aria-labelledby="demo-h">
+    <h2 id="demo-h">Five example runs</h2>
+    <div class="tabs" role="tablist" id="tabs"></div>
+    <p class="blurb" id="blurb"></p>
+    <div class="steps" id="steps" aria-label="Pipeline steps for this run"></div>
+    <div class="case" id="case"></div>
+  </section>
+
+  <section aria-labelledby="eval-h" id="eval"></section>
+
+  <footer>
+    <p>Every run on this page was produced on 2026-11-19 by <code>seqseec run --format json</code>. The lab notes are synthetic. The reads are simulated with known orientation, and the R1/R2 swap is deliberate. Reads never leave the machine; only the notes, registry quotes and numeric summaries are sent to the LLM.</p>
+    <p>Research use only. Not a diagnostic tool. A person reviews every result before using the settings.</p>
+  </footer>
+</div>
+
+<script>
+const DATA = /*__DATA__*/null;
+const STEP_NAMES = [["extract","1","Read the notes"],["lookup","2–3","Kit registry"],["datacheck","4","Check the reads"],["reconcile","5–6","Reconcile + settings"],["explain","7","Explain"]];
+const el = (tag, attrs = {}, ...kids) => { const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) { if (k === "class") n.className = v; else n.setAttribute(k, v); }
+  for (const k of kids.flat()) if (k != null) n.append(k instanceof Node ? k : String(k)); return n; };
+
+function renderSteps(r) {
+  const box = document.getElementById("steps"); box.replaceChildren();
+  const labels = [["extract","1","Read notes"],["lookup","2","Retrieve kits"],["lookup","3","Infer from docs"],["datacheck","4","Check reads"],["reconcile","5","Reconcile"],["reconcile","6","Settings"],["explain","7","Explain"]];
+  for (const [key, n, t] of labels) {
+    const st = r.steps[key].status;
+    box.append(el("div", {class: "step " + st}, el("div", {class: "n"}, "step " + n), el("div", {class: "t"}, t), el("div", {class: "s"}, st.replace("_", " "))));
+  }
+}
+
+function kv(pairs) { const dl = el("dl", {class: "kv"}); for (const [k, v] of pairs) if (v != null && v !== "") dl.append(el("dt", {}, k), el("dd", {}, v)); return dl; }
+
+function renderCase(c) {
+  const r = c.report, res = r.result, ex = r.steps.extract, look = r.steps.lookup, dc = r.steps.datacheck;
+  document.getElementById("blurb").textContent = c.blurb;
+  renderSteps(r);
+  const left = el("div", {class: "panel"}, el("h3", {}, "Lab notes"), el("p", {class: "notes"}, c.notes));
+  if (ex.status === "ok") {
+    const found = Object.entries(ex.fields).filter(([, v]) => v != null);
+    left.append(el("h3", {}, "Read from the notes (each with a verbatim quote)"),
+      kv(found.map(([k, v]) => [k, el("span", {}, v, " ", el("span", {class: "quote"}, "← “" + (ex.evidence[k] || "") + "”"))])));
+    if (ex.scope === "OUT_OF_SCOPE") left.append(kv([["scope", "OUT_OF_SCOPE: " + (ex.scope_reason || "")]]));
+  }
+  if (look.status === "ok") {
+    const v = el("div", {class: "vendor"});
+    if (look.kit_name) {
+      v.append(el("div", {}, el("strong", {}, look.kit_name), " ", el("span", {class: "chip " + look.evidence_type}, look.evidence_type.replaceAll("_", " "))));
+      if (look.citation) v.append(el("div", {class: "quote"}, "Vendor: “" + look.citation.quote + "”"));
+      v.append(el("div", {}, el("a", {href: look.source_url, target: "_blank", rel: "noopener"}, "Source document")));
+    } else {
+      v.append(el("div", {}, "Candidates: " + (look.candidates || []).map(x => x.kit_id + " (" + x.orientation + ")").join(", ")));
+    }
+    v.append(el("div", {class: "mono"}, "document result: " + look.document_orientation));
+    if (look.reason) v.append(el("div", {class: "quote"}, look.reason));
+    left.append(el("h3", {}, "Kit registry (retrieval: " + look.retrieval_method + ")"), v);
+  }
+  if (r.questions && r.questions.length) left.append(el("h3", {}, "Follow-up question"), el("ul", {class: "plain"}, r.questions.map(q => el("li", {}, q))));
+
+  const right = el("div", {class: "panel"});
+  const flags = [res.provisional && "PROVISIONAL", res.human_review_required && "HUMAN REVIEW REQUIRED"].filter(Boolean);
+  right.append(el("div", {class: "state"}, el("span", {class: "pill " + res.state}, res.state), ...flags.map(f => el("span", {class: "flag"}, f))),
+    el("p", {}, res.message));
+  right.append(el("div", {class: "evidence-row"},
+    el("div", {class: "ev"}, el("div", {class: "l"}, "Documents"), el("div", {class: "v"}, res.document_orientation)),
+    el("div", {class: "ev"}, el("div", {class: "l"}, "Reads"), el("div", {class: "v"}, res.data_call.replace("_", " "))),
+    el("div", {class: "ev"}, el("div", {class: "l"}, "Layout"), el("div", {class: "v"}, res.layout))));
+  if (dc.result && dc.result.forward_share != null) {
+    const f = dc.result.forward_share * 100, rv = dc.result.reverse_share * 100;
+    right.append(el("h3", {}, "Read check (how_are_we_stranded_here, " + (dc.result.layout === "SE" ? "single-end" : "paired-end") + ")"),
+      el("div", {class: "bar", role: "img", "aria-label": `read 1 on transcript strand ${f.toFixed(1)}%, antisense ${rv.toFixed(1)}%`},
+        el("div", {class: "f", style: `width:${f}%`}), el("div", {class: "r", style: `width:${rv}%`})),
+      el("div", {class: "legend"}, el("span", {}, `read 1 sense (FR) ${f.toFixed(1)}%`), el("span", {}, `read 1 antisense (RF) ${rv.toFixed(1)}%`)));
+  }
+  if (res.likely_causes.length) right.append(el("h3", {}, "Likely causes"), el("ul", {class: "plain"}, res.likely_causes.map(x => el("li", {}, x))));
+  if (res.suggested_checks.length) right.append(el("h3", {}, "Suggested checks"), el("ul", {class: "plain"}, res.suggested_checks.map(x => el("li", {}, x))));
+  if (res.settings) {
+    const t = el("table", {}, el("thead", {}, el("tr", {}, el("th", {}, "Tool"), el("th", {}, "Setting"))),
+      el("tbody", {}, Object.entries(res.settings.tools).map(([tool, s]) => el("tr", {}, el("td", {}, tool), el("td", {class: "mono"}, s.setting)))));
+    right.append(el("h3", {}, `Downstream settings: ${res.orientation} (${res.settings.library_type}), from ${res.settings_basis}`), el("div", {class: "tablebox"}, t));
+  }
+  document.getElementById("case").replaceChildren(left, right);
+}
+
+function renderEval(ev) {
+  const box = document.getElementById("eval");
+  if (!ev) { box.hidden = true; return; }
+  const m = ev.metrics, meta = ev.meta;
+  const names = {rules: "Rules only (no LLM)", rag: "LLM + kit registry (SeqSeec)", norag: "Same LLM, no registry"};
+  const pct = ([k, n]) => `${k}/${n}`;
+  const sum = el("table", {}, el("thead", {}, el("tr", {}, ["Method", "Correct", "95% CI", "Confident wrong", "Kit correct"].map(h => el("th", {}, h)))),
+    el("tbody", {}, Object.entries(m.arms).map(([arm, a]) => el("tr", {},
+      el("td", {}, names[arm]), el("td", {class: "mono"}, pct(a.accuracy)),
+      el("td", {class: "mono"}, a.accuracy_wilson95 ? a.accuracy_wilson95.map(x => Math.round(x * 100) + "%").join("–") : ""),
+      el("td", {class: "mono"}, a.confident_wrong), el("td", {class: "mono"}, a.kit_accuracy ? pct(a.kit_accuracy) : "n/a")))));
+  const cell = (ans, exp) => el("td", {class: "mono " + (ans === exp ? "hit" : "miss")}, ans);
+  const rows = el("table", {}, el("thead", {}, el("tr", {}, ["Case", "Source", "Category", "Expected", "Rules", "SeqSeec", "No registry"].map(h => el("th", {}, h)))),
+    el("tbody", {}, ev.rows.map(r => el("tr", {}, el("td", {class: "mono"}, r.id), el("td", {}, r.source), el("td", {}, r.category.replaceAll("_", " ")),
+      el("td", {class: "mono"}, r.expected), cell(r.rules, r.expected), cell(r.rag, r.expected), cell(r.norag, r.expected)))));
+  box.append(el("h2", {id: "eval-h"}, "Held-out evaluation"),
+    el("p", {class: "lede"}, `${m.n_in_scope} in-scope cases (${ev.rows.filter(r => r.source === "real").length} from real GEO library descriptions, the rest synthetic), labeled from vendor documents before any model run, and run once on ${meta.date} with ${meta.model}. Out-of-scope cases (${m.n_out_of_scope}) are scored on step 1 only: ${m.scope_correct}/${m.n_cases} scope decisions were correct. "Confident wrong" counts answers that named a direction when the expected answer was different, which is the error that matters most. With this few cases, read the counts rather than the percentages.`),
+    el("div", {class: "tablebox"}, sum), el("h3", {}, "Every case"), el("div", {class: "tablebox"}, rows),
+    el("p", {class: "muted"}, `Source: ${ev.file} (commit ${meta.commit}).`));
+}
+
+(function init() {
+  const tabs = document.getElementById("tabs");
+  document.getElementById("replay-meta").textContent = "Nothing here runs live; each tab shows a saved report from the real pipeline (DeepSeek for steps 1 and 3, kallisto + RSeQC on this machine for step 4).";
+  DATA.cases.forEach((c, i) => {
+    const b = el("button", {class: "tab", role: "tab", id: "tab-" + c.key, "aria-selected": i === 0 ? "true" : "false"}, c.title);
+    b.addEventListener("click", () => { for (const t of tabs.children) t.setAttribute("aria-selected", "false"); b.setAttribute("aria-selected", "true"); renderCase(c); });
+    tabs.append(b);
+  });
+  renderCase(DATA.cases[0]);
+  renderEval(DATA.eval);
+})();
+</script>

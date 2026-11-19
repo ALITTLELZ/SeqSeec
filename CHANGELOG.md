@@ -2,6 +2,12 @@
 
 Dated record of every change, its reason, and its owner. Newest first.
 
+## 2026-11-19 — replay page (Track B, branch `feat/replay-demo`)
+
+### Added
+- `demo/index.html`: static replay of five saved `seqseec run` reports (concordant; R1/R2 swapped → conflict; look-alike kit name → data decides; notes only → unverified; Nanopore → out of scope) and the held-out evaluation table. Clearly labeled as a replay; nothing runs live.
+- `demo/build_replay.py` + `demo/replay_template.html`: rebuild the page from `demo/reports/` and the newest `eval/results/` file. `demo/notes/` holds the synthetic demo notes; `demo/reports/` the saved reports (DeepSeek for steps 1 and 3, kallisto + RSeQC for step 4 on the simulated reads).
+
 ## 2026-11-19 — run 2 (branch `feat/eval-heldout`)
 
 Second model run at commit `e1c8bd6` (revised registry and labels; prompts unchanged). **Not blind**: the labels were revised after seeing run 1. Result file: `eval/results/cases_heldout_2026-11-19_e1c8bd6.{json,md}`.

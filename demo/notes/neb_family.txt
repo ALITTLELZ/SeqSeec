@@ -1,0 +1,1 @@
+SYNTHETIC DEMO. Libraries were made with the NEBNext Ultra II kit and sequenced single-end 100 bp.

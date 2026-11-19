@@ -1,0 +1,1 @@
+SYNTHETIC DEMO. Direct RNA sequencing on an Oxford Nanopore PromethION flow cell.
