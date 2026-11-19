@@ -2,6 +2,24 @@
 
 Dated record of every change, its reason, and its owner. Newest first.
 
+## 2026-11-19 — steps 2–3: kit registry, retrieval, document inference (Track B, branch `feat/kit-registry`)
+
+### Added
+- `library/kit_registry.csv`: 9 kits + 1 chemistry entry (dUTP). Every row has the orientation, an `explicit` or `inferred_from_chemistry` evidence label, the vendor source URL and version, and a verbatim quote. Look-alike pairs on purpose: TruSeq Stranded mRNA (RF) vs TruSeq RNA v2 (unstranded); NEBNext Ultra II Directional (RF) vs Ultra II non-directional (unstranded). **Second check by another member is still pending** (`checked_by` column).
+  - Explicit: Illumina KB #1233 and #2238 (TruSeq/Illumina Stranded: Read 1 antisense; TruSeq RNA v2: no strand information), NEB E7770 manual v3.1 (non-directional), Lexogen 117UG228V0201 (Read 1 represents the transcript → FR).
+  - Inferred from chemistry: NEB E7760 manual v7.0 and KAPA KR1352 v4.17 describe dUTP second-strand marking but do not name the read; Illumina KB #2238 documents that this chemistry gives Read 1 antisense.
+  - Not included: Takara SMARTer Pico v2/v3 (vendor pages returned 403, so no verifiable quote).
+- `library/aliases.csv`: names and catalog numbers → kit ids; family names (e.g. "NEBNext Ultra II") map to several kits.
+- `seqseec/retrieve.py` (step 2): alias matching, longest span wins, kits over chemistry; keyword fallback for reordered names.
+- `seqseec/infer.py` (step 3): `infer_rules` (no LLM), `infer` (LLM chooses among candidates with prompt `infer_v1`; code checks the notes quote, the vendor citation and look-alikes, and takes the orientation from the registry), `infer_without_retrieval` (baseline, prompt `infer_noretrieval_v1`).
+- Pipeline lookup step now runs steps 2–3 (`--llm none` → rules only); text report shows the kit, evidence type, source and vendor quote.
+- Tests: `test_retrieve.py`, `test_infer.py`; `test_pipeline.py` and `test_cli.py` updated (fake server also answers step 3). 334 pass.
+
+### Live checks (DeepSeek `deepseek-flash`, 2026-11-19)
+- `scripts/check_llm_live.py --extract`: LIVE CHECK OK; step 1 gave kit, PE, polyA, no rejected fields, IN_SCOPE, and the kit-version question, as expected. (Ticks the to-do in the 2026-11-19 llm/extract entries.) Note: `organism` came back as "HeLa cells".
+- Six synthetic notes, step 3 with vs without retrieval: KAPA (reordered name) → retrieval RF, rules INSUFFICIENT; CORALL → retrieval **FR** (vendor: Read 1 = transcript), no-retrieval **RF (wrong)**; NEBNext family name → AMBIGUOUS.
+- The no-retrieval call hit `max_tokens` 2000 once (1465 reasoning tokens), so step 3 now defaults to 4000.
+
 ## 2026-11-19 — one command, local LLM mode (XD, branch `feat/cli`)
 
 ### Added

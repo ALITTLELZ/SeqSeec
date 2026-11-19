@@ -1,7 +1,7 @@
 # File: seqseec/cli.py
-# Version: 0.1.0
-# Last modified: 2026-11-19 (XD)
-# Change: Command line: `seqseec run` (whole pipeline, --llm api|local|none) and `seqseec settings`.
+# Version: 0.1.1
+# Last modified: 2026-11-19 (Track B)
+# Change: Steps 2-3 are built: updated the documents option group help.
 """SeqSeec command line.
 
   seqseec run --notes notes.txt [--r1 R1.fq.gz --r2 R2.fq.gz --gtf genes.gtf --transcripts tx.fa]
@@ -49,9 +49,9 @@ def build_parser():
     g.add_argument("--base-url", help="server URL; overrides SEQSEEC_LLM_BASE_URL / SEQSEEC_LOCAL_BASE_URL")
     g.add_argument("--env-file", default=".env", help="file with keys and settings (default .env)")
 
-    g = run.add_argument_group("documents (steps 2-3; kit lookup not built yet)")
+    g = run.add_argument_group("documents (steps 2-3: kit registry lookup)")
     g.add_argument("--expected", type=_upper, choices=ORIENTATION_CHOICES, metavar="{FR,RF,UNSTRANDED}",
-                   help="orientation the kit documents give, if you already know it")
+                   help="skip the kit lookup and use this orientation from the kit documents")
 
     g = run.add_argument_group("reads (step 4; runs locally, reads never leave the machine)")
     g.add_argument("--r1", metavar="FASTQ", help="read 1 (or the only read file for single-end)")
