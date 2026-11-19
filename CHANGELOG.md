@@ -14,9 +14,7 @@ Dated record of every change, its reason, and its owner. Newest first.
 - `tests/test_payload.py`: allowed and refused payloads, allow-lists kept in step with `datacheck` and `reconcile`, and the plan §12 check that no read sequences reach the audit log.
 - `.gitignore`: `audit/`. README: status row for the payload gate.
 - `docs/SeqSeec_Prototype_Plan_EN.md` §3: isolation bullet now states the concrete rules above.
-
-### Note
-- This branch is built on `fix/reconcile-review-followups` (PR #2), because the reconcile allow-list uses `documents_confirmed_by_data`.
+- The reconcile allow-list uses `documents_confirmed_by_data`, so this needs PR #2 (merged 2026-11-19).
 
 ## 2026-11-19 — step 5 follow-ups from the PR #1 review (XD, branch `fix/reconcile-review-followups`)
 
