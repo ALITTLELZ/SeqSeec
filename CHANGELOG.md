@@ -13,6 +13,7 @@ Addresses the non-blocking points in ALITTLELZ's review of PR #1.
 - **AMBIGUOUS with a data call** (review item 3). The message now says the reads can be used to choose among the candidate kits, instead of "kit could not be identified".
 - **INSUFFICIENT keeps the data checks** (review item 3). With an INCONCLUSIVE or INVALID data call, the result now includes the same contamination, quality and reference checks as the other states.
 - README status for steps 5–6 updated from "in review" to "working".
+- `docs/SeqSeec_Prototype_Plan_EN.md` brought in line with the code. §5 reconciliation table: added the OUT_OF_SCOPE row; ambiguous handling; UNVERIFIED gives provisional document settings; INSUFFICIENT keeps the data-check suggestions; note on `documents_confirmed_by_data`. Settings table: marked as checked against official docs, and added the single-end differences. §4 ambiguous step: the data call can choose among the candidates. **The PDF copy is not regenerated and still shows the Nov 8 text; the `.md` is current.**
 
 ## 2026-11-18 — steps 5–6: reconcile and settings (XD, branch `feat/reconcile-settings`)
 
