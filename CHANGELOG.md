@@ -2,6 +2,25 @@
 
 Dated record of every change, its reason, and its owner. Newest first.
 
+## 2026-11-19 — held-out evaluation, run once (Track B, branch `feat/eval-heldout`)
+
+### Added
+- `eval/cases_heldout.jsonl`: 28 cases (17 real GEO library descriptions with accessions, 11 synthetic hard cases: reordered name, abbreviation, chemistry only, prompt injection, out of scope). `eval/cases_dev.jsonl`: the 6 notes used during development. Labels come from the registry's vendor quotes and were written before any model run; **second check by another member is pending**.
+- `eval/run_eval.py`: step 1 scope + three ways to get the documents' orientation (rules / LLM + registry / same LLM without registry); Wilson 95% intervals; append-only results.
+- `eval/results/cases_heldout_2026-11-19_fba4c90.{json,md}`: the single held-out run (prompts `extract_v1`, `infer_v1`, `infer_noretrieval_v1`, model `deepseek-flash`).
+
+### Results (26 in-scope cases; 2 out-of-scope cases scored on step 1 only)
+| Method | Correct | Wilson 95% | Confident wrong | Kit correct |
+|---|---|---|---|---|
+| Rules only | 22/26 | 0.67–0.94 | 1 | 12/15 |
+| LLM + registry (SeqSeec) | 23/26 | 0.71–0.96 | 1 | 14/15 |
+| Same LLM, no registry | 18/26 | 0.50–0.84 | 3 | n/a |
+
+- Step 1 scope: 27/28 (the miss is R12, where step 1 hit `max_tokens`).
+- The no-registry baseline hit `max_tokens` on 3 cases (R16, S01, S09); these count as INSUFFICIENT, which made S01 and S09 wrong. In the dev run without a cutoff, the baseline answered CORALL as RF, which is also wrong.
+- SeqSeec's one confident error is R13 ("Illumina Stranded mRNA Prep **or** Takara SMART-Seq mRNA"): the alternative kit is not in the registry, so only one candidate was seen. Limitation: an unregistered alternative can hide ambiguity.
+- No prompt was changed after this run.
+
 ## 2026-11-19 — steps 2–3: kit registry, retrieval, document inference (Track B, branch `feat/kit-registry`)
 
 ### Added
