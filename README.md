@@ -14,7 +14,8 @@ The team plan is in [docs/SeqSeec_Prototype_Plan_EN.pdf](docs/SeqSeec_Prototype_
 | 4 Local data check | `seqseec/datacheck.py` | **working**: wraps how_are_we_stranded_here; 7/7 smoke tests pass |
 | 5–6 Reconcile, downstream settings | `seqseec/reconcile.py`, `settings.py` | **working**: decision table (incl. out-of-scope) and settings lookup; settings checked against official tool docs |
 | 7 Explanation | `seqseec/explain.py` | not started |
-| LLM payload gate + audit log (used by steps 1, 3, 7) | `seqseec/payload.py` | **working**: per-task allow-lists, read/FASTQ/API-key guards, append-only audit log; no LLM calls yet |
+| LLM payload gate + audit log (used by steps 1, 3, 7) | `seqseec/payload.py` | **working**: per-task allow-lists, read/FASTQ/API-key guards, append-only audit log |
+| LLM client (used by steps 1, 3, 7) | `seqseec/llm.py` | **working, untested against the live API** (run `python scripts/check_llm_live.py` with a key; see CHANGELOG to-do): DeepSeek JSON mode, accepts only `build_payload()` output, retries blank/invalid JSON, logs model ID and usage per call |
 
 ## Setup
 
@@ -35,6 +36,15 @@ conda config --file "$(conda info --base)/envs/seqseec-tools/.condarc" --set sub
 On Linux or an HPC cluster, drop the `CONDA_SUBDIR=osx-64` prefix. See the comments in `envs/tools-osx64.yml` for why each version is pinned.
 
 **2. App environment: the pipeline itself.** It will be added with steps 1–3. For now any Python ≥ 3.10 with `pytest` runs the tests.
+
+**3. LLM API key (only needed for real LLM calls; the tests never call the API).** Create a `.env` file in the repo root. It is git-ignored; never commit it.
+
+```bash
+DEEPSEEK_API_KEY=sk-...
+# optional overrides
+# SEQSEEC_LLM_MODEL=deepseek-flash        # default; deepseek-v4-pro is the larger model
+# SEQSEEC_LLM_BASE_URL=https://api.deepseek.com
+```
 
 ## Tests
 

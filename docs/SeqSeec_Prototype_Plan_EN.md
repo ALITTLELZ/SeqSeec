@@ -1,6 +1,6 @@
 # SeqSeec Prototype Plan
 
-**BIOINF 535 Group Project · Xiaomeng Du, Zhen Liu, Mariam Fateh · Team discussion draft, Nov 8, 2026 · §3–§5 updated Nov 19, 2026 to match the code**
+**BIOINF 535 Group Project · Xiaomeng Du, Zhen Liu, Mariam Fateh · Team discussion draft, Nov 8, 2026 · §2–§5 updated Nov 19, 2026 to match the code**
 
 **Due:** Prototype & Spec Sheet, Mon Nov 16, 2026 (50 pts). Presentation Dec 2 or 9. **Status (Sun Nov 8):** last week's meeting did not happen, and no code or test data exists yet. Work starts Mon Nov 9, which leaves **7 working days**.
 
@@ -24,7 +24,9 @@ SeqSeec is the **reverse of last year's CmdSmith**.
 
 **Model: use an API, not a local model.**
 - The test load is small (about 30 cases, a few hundred calls), so cost is low. An API needs no deployment, which leaves time for evaluation.
-- We use the **DeepSeek API** (already available). The code keeps a thin LLM interface so the model can be swapped later in one place. We freeze the model before formal evaluation and report its exact model ID and date.
+- We use the **DeepSeek API** (already available). The code keeps a thin LLM interface (`seqseec/llm.py`) so the model can be swapped later in one place. We freeze the model before formal evaluation and report its exact model ID and date.
+  - The model name is set with `SEQSEEC_LLM_MODEL`. The default is `deepseek-flash`, which DeepSeek served with DeepSeek-V4.1-Flash-1017 as of Nov 19, 2026; `deepseek-v4-pro` is the larger option. The key is `DEEPSEEK_API_KEY` in `.env`.
+  - Every call uses JSON mode and sends only a payload built by `payload.py`. Each attempt is logged to `audit/llm_calls.jsonl` with the requested and returned model IDs, the prompt ID and hash, the payload hash and token usage, which gives the model ID and date to report.
 - With a third-party API, notes leave the machine. So the prototype uses **public or synthetic notes only**, and the spec sheet says so.
 - A local model (Ollama) is future work only; with the shortened timeline we drop the comparison experiment.
 
