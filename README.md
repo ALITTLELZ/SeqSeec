@@ -10,7 +10,8 @@ The team plan is in [docs/SeqSeec_Prototype_Plan_EN.pdf](docs/SeqSeec_Prototype_
 
 | Step | Module | Status |
 |---|---|---|
-| 1–3 Notes → kit → expected orientation (LLM + RAG) | `seqseec/extract.py`, `retrieve.py`, `infer.py` | not started |
+| 1 Notes → fields (LLM) | `seqseec/extract.py`, `prompts/extract_v1.md` | **working with a fake LLM; live run pending**: quote-checked fields, scope decided by code, follow-up questions |
+| 2–3 Fields → kit → expected orientation (RAG + LLM) | `seqseec/retrieve.py`, `infer.py` | not started (needs the kit registry from Track A) |
 | 4 Local data check | `seqseec/datacheck.py` | **working**: wraps how_are_we_stranded_here; 7/7 smoke tests pass |
 | 5–6 Reconcile, downstream settings | `seqseec/reconcile.py`, `settings.py` | **working**: decision table (incl. out-of-scope) and settings lookup; settings checked against official tool docs |
 | 7 Explanation | `seqseec/explain.py` | not started |
@@ -77,6 +78,8 @@ python tests/toy/run_smoke.py
 
 ```
 seqseec/    pipeline modules
+prompts/    versioned LLM prompts (prompt ID = file name)
+scripts/    helper scripts, e.g. the live LLM check
 envs/       conda environment files
 tests/      unit tests; tests/toy/ holds the simulator and smoke test
 docs/       team plan; spec sheet later

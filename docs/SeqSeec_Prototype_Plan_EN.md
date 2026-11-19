@@ -1,6 +1,6 @@
 # SeqSeec Prototype Plan
 
-**BIOINF 535 Group Project · Xiaomeng Du, Zhen Liu, Mariam Fateh · Team discussion draft, Nov 8, 2026 · §2–§5 updated Nov 19, 2026 to match the code**
+**BIOINF 535 Group Project · Xiaomeng Du, Zhen Liu, Mariam Fateh · Team discussion draft, Nov 8, 2026 · §2–§5 and §8 updated Nov 19, 2026 to match the code**
 
 **Due:** Prototype & Spec Sheet, Mon Nov 16, 2026 (50 pts). Presentation Dec 2 or 9. **Status (Sun Nov 8):** last week's meeting did not happen, and no code or test data exists yet. Work starts Mon Nov 9, which leaves **7 working days**.
 
@@ -57,6 +57,7 @@ FASTQ/BAM ─► 4 Local tools ─► numeric summary only ─► 5 Reconcile (d
                                                7 Explanation (LLM, JSON only) ─► Report, human confirms
 ```
 
+- **Step 1 checks (in code, `seqseec/extract.py`, prompt `prompts/extract_v1.md`):** the LLM returns ten fields: kit name, version, vendor, chemistry, strand statement, RNA selection, read layout, platform, library type and organism. Each non-null field needs a quote that appears verbatim in the notes, or it is dropped and listed. Fixed-choice fields must use allowed values. Code, not the LLM, marks Nanopore, PacBio and single-cell as `out of scope` and writes the questions to ask when the kit, its version or the read layout is missing.
 - **Step 3 checks (in code):** the chunk exists, the quote appears in that chunk, and the kit is in the registry. Any failure forces `Not sufficient information`.
 - **Step 4 routes:** FASTQ goes to `check_strandedness`; BAM goes to RSeQC `infer_experiment.py`. The LLM has no shell access.
 - **Isolation enforced by code:** an allow-list function (`seqseec/payload.py`) builds every LLM payload (notes, public document chunks, numeric summaries). Each task may use only its own parts: step 1 notes; step 3 notes, extracted fields and chunks; step 7 fields, inference, data summary, reconciliation result and chunks. Structured parts have key allow-lists, so an unexpected field such as a file path is refused. A run of 30 or more nucleotides, a FASTQ record or an API key blocks the whole payload; chunks from the curated library are exempt from the nucleotide-run check only, because kit manuals quote adapter sequences. All payloads, and every refusal (without the refused content), go to an append-only audit log, and a test asserts that no read sequences appear there.
@@ -200,7 +201,7 @@ If we fall behind, Nov 16 must still include:
   ```
 - **`CHANGELOG.md`:** dated entries with the change, reason and owner, so we can trace development later.
 - **Milestone tags:** see the schedule above.
-- **Prompts are versioned too** (such as `prompts/infer_v2.md`), with changes logged.
+- **Prompts are versioned too** (such as `prompts/infer_v2.md`), with changes logged. Each prompt file starts with an HTML-comment header (file, version, date, change) that is stripped before sending; the prompt ID is the file name.
 - **Results are traceable:** each evaluation result records commit hash, prompt version, model ID and run date. `eval/results/` is append-only.
 - **Automated check:** a test confirms that every script in `seqseec/` has the header.
 

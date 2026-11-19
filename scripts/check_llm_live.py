@@ -1,14 +1,15 @@
 # File: scripts/check_llm_live.py
-# Version: 0.1.0
+# Version: 0.2.0
 # Last modified: 2026-11-19 (XD)
-# Change: One-call live check of the DeepSeek API through payload.py + llm.py, using a synthetic note.
+# Change: Add --extract to also run step 1 (extract.py, prompt extract_v1) live on the same synthetic note.
 """Send ONE synthetic lab note to the real LLM API and print what came back.
 
 Needs DEEPSEEK_API_KEY in the environment or in .env (repo root). Costs a
 fraction of a cent. Only the synthetic note below leaves the machine.
 
 Usage (from the repo root):
-  python scripts/check_llm_live.py
+  python scripts/check_llm_live.py             # one raw call through llm.py
+  python scripts/check_llm_live.py --extract   # also run step 1 (one more call)
 Writes to audit/payload_audit.jsonl and audit/llm_calls.jsonl (both git-ignored).
 """
 import json
@@ -16,6 +17,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from seqseec.extract import extract  # noqa: E402
 from seqseec.llm import LLMError, call_llm, get_config  # noqa: E402
 from seqseec.payload import build_payload  # noqa: E402
 
@@ -41,6 +43,17 @@ def main():
     print(f"  attempts        : {rec['attempt']}")
     print(f"  tokens          : {rec['usage']}")
     print(f"  output          : {json.dumps(result['output'])}")
+
+    if "--extract" in sys.argv[1:]:
+        try:
+            out = extract(NOTE, config=config)
+        except (LLMError, ValueError) as err:
+            sys.exit(f"STEP 1 LIVE CHECK FAILED: {err}")
+        print("STEP 1 (extract_v1) OK")
+        print(f"  fields    : {json.dumps({k: v for k, v in out['fields'].items() if v is not None})}")
+        print(f"  rejected  : {json.dumps(out['rejected'])}")
+        print(f"  scope     : {out['scope']}")
+        print(f"  questions : {json.dumps(out['questions'])}")
     print("Please paste these lines into the PR or group chat and note the date.")
 
 
