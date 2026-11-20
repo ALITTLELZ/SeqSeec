@@ -2,11 +2,24 @@
 
 Dated record of every change, its reason, and its owner. Newest first.
 
+## 2026-11-20 — replay page: show the right eval run (XD, branch `fix/replay-eval-pick`, into #9)
+
+### Fixed
+- **Wrong run on rebuild.** `demo/build_replay.py` picked the "newest" eval result by file time. In a fresh clone every file has the same time, so a rebuild showed run 1 (`fba4c90`) instead of run 2. Ordering by commit is not possible either, because run 1's commit exists only in the `eval-heldout-2026-11-19` tag. The page now shows the run named in `EVAL_RESULT` (run 2, `e1c8bd6`), or the file given with `--eval`. **After a new eval run, update `EVAL_RESULT` and rebuild.**
+- The page is written with LF line endings on every OS. `--out` writes it elsewhere.
+
+### Added
+- `tests/test_demo.py`:
+  - a rebuild must match the committed `demo/index.html` byte for byte, so a stale page fails the tests;
+  - the named run is shown even when other result files look newer;
+  - the page has no paths or read sequences.
+- `tests/test_headers.py` also checks `demo/`.
+
 ## 2026-11-19 — replay page (Track B, branch `feat/replay-demo`)
 
 ### Added
 - `demo/index.html`: static replay of five saved `seqseec run` reports (concordant; R1/R2 swapped → conflict; look-alike kit name → data decides; notes only → unverified; Nanopore → out of scope) and the held-out evaluation table. Clearly labeled as a replay; nothing runs live.
-- `demo/build_replay.py` + `demo/replay_template.html`: rebuild the page from `demo/reports/` and the newest `eval/results/` file. `demo/notes/` holds the synthetic demo notes; `demo/reports/` the saved reports (DeepSeek for steps 1 and 3, kallisto + RSeQC for step 4 on the simulated reads).
+- `demo/build_replay.py` + `demo/replay_template.html`: rebuild the page from `demo/reports/` and the eval run named in `EVAL_RESULT` (see the fix below). `demo/notes/` holds the synthetic demo notes; `demo/reports/` the saved reports (DeepSeek for steps 1 and 3, kallisto + RSeQC for step 4 on the simulated reads).
 
 ## 2026-11-19 — run 2 (branch `feat/eval-heldout`)
 
