@@ -1,7 +1,7 @@
 # File: pyproject.toml
-# Version: 0.1.0
-# Last modified: 2026-11-19 (XD)
-# Change: Package metadata so `pip install -e .` provides the `seqseec` command.
+# Version: 0.5.0
+# Last modified: 2026-11-20 (Track B)
+# Change: Version 0.5.0, matching the prototype spec sheet v0.5.
 
 [build-system]
 requires = ["setuptools>=61"]
@@ -9,7 +9,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "seqseec"
-version = "0.1.0"
+version = "0.5.0"
 description = "RNA-seq strandedness from lab notes and reads, with downstream tool settings"
 requires-python = ">=3.10"
 dependencies = []          # standard library only so far

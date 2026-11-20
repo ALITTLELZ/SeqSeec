@@ -1,8 +1,8 @@
 # File: seqseec/payload.py
-# Version: 0.1.0
-# Last modified: 2026-11-19 (XD)
-# Change: Allow-list payload builder for every LLM call, with content guards and an append-only audit log.
-"""The only gate between SeqSeec and the LLM (plan §3, "isolation enforced by code").
+# Version: 0.1.1
+# Last modified: 2026-11-20 (Track B)
+# Change: Removed references to the retired team plan document (comments only).
+"""The only gate between SeqSeec and the LLM (isolation is enforced by code).
 
 Every LLM call (step 1 extract, step 3 infer, step 7 explain) must get its input
 from build_payload(). It:

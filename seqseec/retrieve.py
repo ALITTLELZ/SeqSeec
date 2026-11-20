@@ -1,7 +1,7 @@
 # File: seqseec/retrieve.py
-# Version: 0.1.1
-# Last modified: 2026-11-19 (Track B)
-# Change: Chunk text also carries the registry's evidence_note (limits of the evidence) after the second check.
+# Version: 0.1.2
+# Last modified: 2026-11-20 (Track B)
+# Change: Removed references to the retired team plan document (comments only).
 """Step 2: find the kit-registry entries that the notes may refer to.
 
 The library is library/kit_registry.csv (hand-curated; every orientation has a
@@ -19,8 +19,8 @@ retrieve(notes, fields) returns candidate entries as payload "chunks":
      written in another order). These are offered to step 3 as weaker candidates.
 
 This is a lightweight, deterministic retriever over registry entries and their
-vendor quotes, not a vector store over full manuals (see plan §4 and the spec
-sheet's limitations).
+vendor quotes, not a vector store over full manuals (see the spec sheet's
+limitations).
 """
 import csv
 import os

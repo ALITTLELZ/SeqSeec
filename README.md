@@ -4,9 +4,7 @@
 
 SeqSeec helps analysts with computational backgrounds work out how an RNA-seq library was made. It reads the lab notes, identifies the library-prep kit and the strandedness that kit should give, and cites the kit documentation. It then compares that expectation with a local check of the reads. Finally, it translates the result into the setting each downstream tool needs, such as `featureCounts -s` or Salmon `-l`. Reads never leave the machine.
 
-The team plan is in [docs/SeqSeec_Prototype_Plan_EN.pdf](docs/SeqSeec_Prototype_Plan_EN.pdf).
-
-## Status (2026-11-20)
+## Status (v0.5, 2026-11-20)
 
 | Step | Module | Status |
 |---|---|---|
@@ -97,7 +95,7 @@ python tests/toy/run_smoke.py
   # Change: <one line>
   ```
 - **Changelog:** every change gets a dated entry in `CHANGELOG.md`.
-- **Milestone tags:** `v0.1-env`, `v0.2-pipeline`, `v0.3-frozen`, `v1.0-submission`.
+- **Tags:** `v0.1-env` (tool environment validated), `eval-heldout-2026-11-19` (exact code of the first evaluation run). The current version is 0.5.0 (`pyproject.toml`), matching spec sheet v0.5.
 - **Never commit:** reads (`*.fastq*`, `*.bam`), vendor PDFs, or `.env`. See `.gitignore`.
 
 ## Repository layout
@@ -108,5 +106,5 @@ prompts/    versioned LLM prompts (prompt ID = file name)
 scripts/    helper scripts, e.g. the live LLM check
 envs/       conda environment files
 tests/      unit tests; tests/toy/ holds the simulator and smoke test
-docs/       team plan; spec sheet later
+docs/       prototype spec sheet (Markdown source + .docx for Google Docs)
 ```

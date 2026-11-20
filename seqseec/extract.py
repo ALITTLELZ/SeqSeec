@@ -1,16 +1,16 @@
 # File: seqseec/extract.py
-# Version: 0.1.0
-# Last modified: 2026-11-19 (XD)
-# Change: Step 1 field extraction: LLM reads notes (prompt extract_v1); code checks quotes, decides scope, asks questions.
+# Version: 0.1.1
+# Last modified: 2026-11-20 (Track B)
+# Change: Removed references to the retired team plan document (comments only).
 """Step 1: extract library-prep facts from lab notes.
 
-The LLM only reads text (plan §3). Code then checks and decides:
+The LLM only reads text. Code then checks and decides:
   * every non-null field needs a quote that appears verbatim in the notes
     (ignoring case, spacing and curly quotes); a field without one is dropped
     and listed in "rejected", so the LLM cannot add facts the notes do not state;
   * fixed-choice fields (read_layout, rna_selection, library_type) must be one
     of the allowed values;
-  * scope (plan §2) is decided by code from the checked platform and
+  * scope (Illumina short-read bulk RNA-seq) is decided by code from the checked platform and
     library_type: Nanopore, PacBio or single-cell -> OUT_OF_SCOPE;
   * when key facts are missing, code writes the questions to ask the user.
 

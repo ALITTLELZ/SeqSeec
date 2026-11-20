@@ -2,6 +2,17 @@
 
 Dated record of every change, its reason, and its owner. Newest first.
 
+## 2026-11-20 — retire the original team plan; version 0.5.0 (Track B, branch `docs/spec-sheet`)
+
+### Removed
+- `docs/SeqSeec_Prototype_Plan_EN.md` and `.pdf`: the Nov 8 team plan has been superseded by the spec sheet. Older CHANGELOG entries still mention it as history.
+- README link to the plan and the plan's milestone-tag list (only `v0.1-env` was ever created).
+- "plan §N" references in code comments and docstrings (11 files; comments only, no behaviour change; file headers bumped).
+
+### Changed
+- Package version 0.1.0 → 0.5.0 (`pyproject.toml`, `seqseec/__init__.py`) to match spec sheet v0.5. Saved reports and the replay page keep the version they were produced with.
+- README: status heading shows v0.5; `docs/` described as the spec sheet folder; tags section lists the tags that exist.
+
 ## 2026-11-20 — prototype spec sheet v0.5 (Track B, branch `docs/spec-sheet`)
 
 ### Added

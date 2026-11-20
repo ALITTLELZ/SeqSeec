@@ -1,8 +1,8 @@
 # File: eval/run_eval.py
-# Version: 0.2.0
-# Last modified: 2026-11-19 (Track B)
-# Change: Add answered-with-a-direction metric, --rescore (new labels, no model calls) and --note.
-"""Run the notes-level evaluation (plan §6A) and write an append-only result file.
+# Version: 0.2.1
+# Last modified: 2026-11-20 (Track B)
+# Change: Removed references to the retired team plan document (comments only).
+"""Run the notes-level evaluation (spec sheet §3.4) and write an append-only result file.
 
 For each case: step 1 extract (LLM) -> fields and scope; then three ways to get the
 documents' orientation:

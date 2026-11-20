@@ -1,7 +1,7 @@
 # File: seqseec/datacheck.py
-# Version: 0.1.0
-# Last modified: 2026-11-08 (Track B)
-# Change: Run how_are_we_stranded_here in a space-free staging dir; parse its RSeQC output; apply data-call rules.
+# Version: 0.1.1
+# Last modified: 2026-11-20 (Track B)
+# Change: Removed references to the retired team plan document (comments only).
 """Step 4: local data check.
 
 Runs ``check_strandedness`` (how_are_we_stranded_here) in the separate
@@ -14,7 +14,7 @@ Thresholds mirror how_are_we_stranded_here (commit e6ce74d):
   max fraction < 0.6                                    -> unstranded
   otherwise                                             -> inconclusive
 The tool itself only *warns* when more than half of the reads cannot be
-assigned; SeqSeec is stricter and marks such a check INVALID (see plan §5).
+assigned; SeqSeec is stricter and marks such a check INVALID.
 """
 import os
 import re

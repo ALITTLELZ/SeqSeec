@@ -1,7 +1,7 @@
 # File: tests/test_payload.py
-# Version: 0.1.0
-# Last modified: 2026-11-19 (XD)
-# Change: Tests for the LLM payload gate: allow-lists, content guards, audit log, no reads in the log.
+# Version: 0.1.1
+# Last modified: 2026-11-20 (Track B)
+# Change: Removed references to the retired team plan document (comments only).
 import json
 import random
 
@@ -175,7 +175,7 @@ def test_empty_notes(log):
     assert "non-empty" in blocked(log, "extract", notes="   ")
 
 
-# ---------- plan §12: no read sequences in the audit log ----------
+# ---------- no read sequences in the audit log ----------
 
 def test_no_read_sequences_in_audit_log(log):
     # Try to smuggle a read (and a key) through every part; also log some valid payloads.

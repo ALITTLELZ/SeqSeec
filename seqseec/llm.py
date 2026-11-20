@@ -1,9 +1,9 @@
 # File: seqseec/llm.py
-# Version: 0.2.0
-# Last modified: 2026-11-19 (XD)
-# Change: Add local mode (OpenAI-compatible server on this machine, e.g. Ollama): no API key, loopback host only.
-"""The only module that talks to the LLM (plan §2: "a thin LLM interface so the
-model can be swapped later in one place").
+# Version: 0.2.1
+# Last modified: 2026-11-20 (Track B)
+# Change: Removed references to the retired team plan document (comments only).
+"""The only module that talks to the LLM: a thin interface, so the model can be
+swapped later in one place.
 
 call_llm() sends exactly one payload made by seqseec.payload.build_payload():
   * it refuses anything else, and refuses a payload changed after it was built
@@ -216,7 +216,7 @@ def call_llm(built, system_prompt, prompt_id, *, config=None, transport=http_pos
 
     built:         return value of seqseec.payload.build_payload()
     system_prompt: prompt text; must mention JSON
-    prompt_id:     version label of the prompt, e.g. "infer_v2" (plan §8: prompts are versioned)
+    prompt_id:     version label of the prompt, e.g. "infer_v2" (prompts are versioned)
     config:        from get_config(); default get_config() (api mode)
     timeout:       seconds per attempt; default from config (60 api, 300 local)
     Raises LLMError on failure, after logging each attempt.
