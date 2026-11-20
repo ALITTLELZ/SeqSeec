@@ -11,7 +11,7 @@ BIOINF 535 Group Project · Xiaomeng Du, Zhen Liu, Mariam Fateh · Prototype ver
 
 **Brief description.** SeqSeec reads the lab notes for an RNA-seq experiment, identifies the library-prep kit, and looks up the read orientation that kit gives (FR, RF or unstranded) in a curated registry of vendor documents. It checks that expectation against the reads themselves with how_are_we_stranded_here run on the user's own machine. It then reports agreement or conflict and the matching setting for featureCounts, HISAT2, Salmon, kallisto, HTSeq and STAR.
 
-**Primary objective.** Getting strandedness wrong silently biases gene-expression estimates, and an audit of 50 ENA studies found only 56% reported strandedness (Signal & Kahlke, 2022). SeqSeec turns incomplete wet-lab notes into a checked, cited answer. It is free to run on a laptop and keeps sequencing reads on the user's machine, so small computational teams without a sequencing core or a wet-lab collaborator get the same check that well-resourced labs do by asking an expert.
+**Primary objective.** Getting strandedness wrong silently biases gene-expression estimates, and an audit of 50 ENA studies found only 56% reported strandedness (Signal & Kahlke, 2022). SeqSeec turns incomplete wet-lab notes into a checked, cited answer. It runs on a laptop with open-source tools, costs a few cents per run in API fees (nothing with `--llm none` or the local-model mode), and keeps sequencing reads on the user's machine. That gives small computational teams without a sequencing core or a wet-lab collaborator a documented check they would otherwise have to get by asking an expert.
 
 **Primary audience.** Bioinformatics analysts and computational or statistical researchers who receive RNA-seq data with limited wet-lab context: graduate students, core-facility analysts, and researchers reusing public data from GEO or SRA. It is the reverse of last year's CmdSmith, which helped wet-lab researchers write command lines; SeqSeec helps computational researchers understand the experiment.
 
@@ -48,7 +48,7 @@ What distinguishes it: how_are_we_stranded_here and RSeQC can call strandedness 
 **Ethical considerations.**
 - **Privacy:** sequencing reads, which can identify a person, never leave the machine; this is enforced in code and checked by tests. Lab notes are sent to a third-party API (DeepSeek). The prototype therefore uses only public or synthetic notes. Real unpublished notes should wait for the local-model mode or institutional approval.
 - **Transparency:** every answer shows its evidence type, vendor quote and source link, and an audit log records each LLM payload, prompt version and model ID.
-- **Bias:** the registry covers major vendors' current kits. Older, regional or in-house protocols fall to INSUFFICIENT rather than to a guess, which is safe but uneven coverage. Two entries rely on chemistry rather than an explicit vendor statement, and are labeled as such.
+- **Bias:** the registry covers major vendors' current kits. Older, regional or in-house protocols fall to INSUFFICIENT rather than to a guess, which is safe but uneven coverage. Three entries (NEBNext Ultra II Directional, KAPA mRNA HyperPrep and the generic dUTP entry) rely on chemistry rather than an explicit vendor statement of read orientation, and are labeled as such.
 - **Human in the loop:** SeqSeec never runs downstream analysis; conflicts and unverified answers require a person's review.
 
 **Potential challenges.**
@@ -71,7 +71,7 @@ What distinguishes it: how_are_we_stranded_here and RSeQC can call strandedness 
 - **Unit and integration tests:** 334 pass (`python -m pytest -q tests`). They cover every cell of the reconciliation table, the settings table, citation checks (fabricated quotes are rejected), look-alike handling, payload isolation (no read sequences in the audit log), and the command line.
 - **Read check:** 7/7 simulated cases call correctly (paired-end FR/RF/unstranded, R1/R2 swapped, single-end FR/RF/unstranded), run end to end through `seqseec run`.
 - **Settings table:** every value checked against official documentation for featureCounts, HISAT2, Salmon, kallisto, HTSeq and STAR.
-- **Held-out notes evaluation** (`eval/`): 28 cases, of which 17 are real GEO descriptions and 2 are out of scope. Labels were written from vendor documents before any model run and second-checked by Zhen Liu. Three methods were compared on the same cases: rules only, LLM + registry (SeqSeec), and the same LLM without the registry.
+- **Held-out notes evaluation** (`eval/`): 28 cases, of which 17 are real GEO descriptions and 2 are out of scope. Labels were first written from vendor documents before any model run, then second-checked by Zhen Liu after run 1 (4 of 28 revised; see the process note below). Three methods were compared on the same cases: rules only, LLM + registry (SeqSeec), and the same LLM without the registry.
 
 Results (model run 2, commit `e1c8bd6`; 26 in-scope cases):
 
