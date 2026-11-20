@@ -12,6 +12,11 @@ Dated record of every change, its reason, and its owner. Newest first.
 - Spec sheet updated after reviewing `main` (v0.4 → v0.5): 338 tests (includes the replay-page rebuild test from #10); code is on `main`.
 - README status table brought up to date (live API checks done, steps 2–3 built, evaluation, replay page, spec sheet).
 
+### Synced from the team's Google Doc (2026-11-20)
+- The team edited the spec sheet in Google Docs, which is now the reference version. `docs/SeqSeec_SpecSheet.md` was rewritten to match it word for word (checked sentence by sentence against the exported PDF): section 1 renamed "The Tool Basics" with explicit "1.1 APP Name and Link"-style headings; the link is the public GitHub repository; Platform lists the three running modes (API, local LLM, no LLM); sections 3.1–3.5 are rewritten as full paragraphs with bold labels. The appendix prompts are unchanged and still match `prompts/` exactly.
+- `scripts/build_spec_docx.py` 0.2.0: keeps headings that are already numbered and the appendix heading as written; numeric table columns get a minimum width so "19/26" stays on one line.
+- **From now on, edit the Google Doc first, then copy the changes back here** so the repository keeps the submitted version.
+
 ## 2026-11-20 — replay page: show the right eval run (XD, branch `fix/replay-eval-pick`, into #9)
 
 ### Fixed

@@ -1,7 +1,7 @@
 # File: scripts/build_spec_docx.py
-# Version: 0.1.0
+# Version: 0.2.0
 # Last modified: 2026-11-20 (Track B)
-# Change: Build the spec sheet .docx (for Google Docs) from the Markdown, styled like the proposal.
+# Change: Keep headings that are already numbered (Markdown now mirrors the team's Google Doc); wider numeric table columns.
 """Build docs/SeqSeec_SpecSheet.docx from docs/SeqSeec_SpecSheet.md.
 
 The Markdown file is the source; this .docx is for uploading to Google Docs
@@ -13,9 +13,11 @@ Docs' link blue.
 
 What the script changes on the way (the Markdown itself is not modified):
   * the "# ..." title and byline line become a title page, followed by a page break;
-  * "## Section" headings are numbered 1., 2., 3.; the Appendix keeps its name;
-  * a paragraph that opens with a bold label ("**App name and link.** text")
-    becomes a numbered subsection heading ("1.1 App name and link.") followed by the text.
+  * "## 1. Section" and "### 1.1 Subsection" headings are kept as written (the Markdown
+    mirrors the team's Google Doc); unnumbered "## Section" headings are numbered 1., 2., 3.;
+    the Appendix heading is kept as written;
+  * a paragraph that opens with a bold label ending in a period ("**App name and link.** text")
+    becomes a numbered subsection heading followed by the text (older layout).
 
 Needs pandoc (tested with 3.1). Usage (repo root):  python scripts/build_spec_docx.py
 """
@@ -65,8 +67,12 @@ def restructure(md):
         m_sec = re.match(r"^## (.+)$", stripped)
         if m_sec and "\n" not in stripped:
             name = m_sec.group(1)
+            numbered = re.match(r"^(\d+)\.\s", name)
             if name.lower().startswith("appendix"):
-                out.append("# Appendix. " + title_case(name.split(":", 1)[1].strip()) if ":" in name else f"# {name}")
+                out.append(f"# {name}")
+            elif numbered:
+                section, sub = int(numbered.group(1)), 0
+                out.append(f"# {name}")
             else:
                 section, sub = section + 1, 0
                 out.append(f"# {section}. {name}")
@@ -229,7 +235,7 @@ def fix_tables(docx_path):
                     for r in re.findall(r"<w:tr[ >].*?</w:tr>", t, flags=re.S):
                         for i, c in enumerate(re.findall(r"<w:tc>.*?</w:tc>", r, flags=re.S)[:len(cols)]):
                             longest[i] = max(longest[i], len("".join(re.findall(r"<w:t[^>]*>([^<]*)</w:t>", c))))
-                    weights = [min(max(n, 8), 34) for n in longest]
+                    weights = [min(max(n, 11), 34) for n in longest]  # 11: '19/26' and 'Correct' stay on one line
                     total = sum(weights)
                     widths = [max(700, round(w * TEXT_WIDTH / total)) for w in weights]
                     widths[-1] += TEXT_WIDTH - sum(widths)
