@@ -1,0 +1,1271 @@
+{
+  "meta": {
+    "case_file": "cases_heldout.jsonl",
+    "date": "2026-11-19",
+    "commit": "e1c8bd6",
+    "model": "deepseek-flash",
+    "mode": "api",
+    "prompts": {
+      "extract": "extract_v1",
+      "infer": "infer_v1",
+      "baseline": "infer_noretrieval_v1"
+    },
+    "note": "Run 2: after the registry revision and the label second check. Prompts unchanged (extract_v1, infer_v1, infer_noretrieval_v1). Not blind: labels were revised after seeing run 1."
+  },
+  "metrics": {
+    "n_cases": 28,
+    "n_in_scope": 26,
+    "n_out_of_scope": 2,
+    "scope_correct": 25,
+    "arms": {
+      "rules": {
+        "accuracy": [
+          19,
+          26
+        ],
+        "accuracy_wilson95": [
+          0.539,
+          0.863
+        ],
+        "confident_wrong": 1,
+        "answered_right": [
+          13,
+          14
+        ],
+        "abstain_recall": [
+          6,
+          7
+        ],
+        "abstain_precision": [
+          6,
+          12
+        ],
+        "kit_accuracy": [
+          12,
+          15
+        ],
+        "confusion": {
+          "FR": {
+            "FR": 2
+          },
+          "RF": {
+            "RF": 8,
+            "INSUFFICIENT": 4
+          },
+          "UNSTRANDED": {
+            "UNSTRANDED": 3,
+            "INSUFFICIENT": 1,
+            "AMBIGUOUS": 1
+          },
+          "AMBIGUOUS": {
+            "AMBIGUOUS": 3
+          },
+          "INSUFFICIENT": {
+            "INSUFFICIENT": 3,
+            "RF": 1
+          }
+        },
+        "per_category": {
+          "abbreviation": [
+            0,
+            1
+          ],
+          "chemistry_only": [
+            1,
+            1
+          ],
+          "family_name": [
+            1,
+            1
+          ],
+          "generic_description": [
+            1,
+            1
+          ],
+          "lookalike": [
+            1,
+            1
+          ],
+          "multiple_kits": [
+            2,
+            2
+          ],
+          "named_kit": [
+            6,
+            6
+          ],
+          "named_kit_case": [
+            1,
+            1
+          ],
+          "named_kit_noisy": [
+            1,
+            1
+          ],
+          "named_kit_typo": [
+            1,
+            1
+          ],
+          "named_kit_version": [
+            1,
+            1
+          ],
+          "no_kit": [
+            2,
+            2
+          ],
+          "prompt_injection": [
+            0,
+            1
+          ],
+          "reordered_name": [
+            0,
+            1
+          ],
+          "stranded_no_direction": [
+            1,
+            1
+          ],
+          "unregistered_alternative": [
+            0,
+            1
+          ],
+          "unregistered_kit": [
+            0,
+            2
+          ],
+          "unregistered_lookalike": [
+            0,
+            1
+          ]
+        },
+        "errors": [
+          {
+            "id": "R13",
+            "expected": "INSUFFICIENT",
+            "answer": "RF",
+            "category": "unregistered_alternative"
+          },
+          {
+            "id": "R15",
+            "expected": "RF",
+            "answer": "INSUFFICIENT",
+            "category": "unregistered_kit"
+          },
+          {
+            "id": "R16",
+            "expected": "RF",
+            "answer": "INSUFFICIENT",
+            "category": "unregistered_kit"
+          },
+          {
+            "id": "R17",
+            "expected": "UNSTRANDED",
+            "answer": "INSUFFICIENT",
+            "category": "unregistered_lookalike"
+          },
+          {
+            "id": "S03",
+            "expected": "RF",
+            "answer": "INSUFFICIENT",
+            "category": "reordered_name"
+          },
+          {
+            "id": "S06",
+            "expected": "UNSTRANDED",
+            "answer": "AMBIGUOUS",
+            "category": "prompt_injection"
+          },
+          {
+            "id": "S07",
+            "expected": "RF",
+            "answer": "INSUFFICIENT",
+            "category": "abbreviation"
+          }
+        ]
+      },
+      "rag": {
+        "accuracy": [
+          21,
+          26
+        ],
+        "accuracy_wilson95": [
+          0.621,
+          0.915
+        ],
+        "confident_wrong": 1,
+        "answered_right": [
+          15,
+          16
+        ],
+        "abstain_recall": [
+          6,
+          7
+        ],
+        "abstain_precision": [
+          6,
+          10
+        ],
+        "kit_accuracy": [
+          14,
+          15
+        ],
+        "confusion": {
+          "FR": {
+            "FR": 2
+          },
+          "RF": {
+            "RF": 9,
+            "INSUFFICIENT": 3
+          },
+          "UNSTRANDED": {
+            "UNSTRANDED": 4,
+            "INSUFFICIENT": 1
+          },
+          "AMBIGUOUS": {
+            "AMBIGUOUS": 3
+          },
+          "INSUFFICIENT": {
+            "INSUFFICIENT": 3,
+            "RF": 1
+          }
+        },
+        "per_category": {
+          "abbreviation": [
+            0,
+            1
+          ],
+          "chemistry_only": [
+            1,
+            1
+          ],
+          "family_name": [
+            1,
+            1
+          ],
+          "generic_description": [
+            1,
+            1
+          ],
+          "lookalike": [
+            1,
+            1
+          ],
+          "multiple_kits": [
+            2,
+            2
+          ],
+          "named_kit": [
+            6,
+            6
+          ],
+          "named_kit_case": [
+            1,
+            1
+          ],
+          "named_kit_noisy": [
+            1,
+            1
+          ],
+          "named_kit_typo": [
+            1,
+            1
+          ],
+          "named_kit_version": [
+            1,
+            1
+          ],
+          "no_kit": [
+            2,
+            2
+          ],
+          "prompt_injection": [
+            1,
+            1
+          ],
+          "reordered_name": [
+            1,
+            1
+          ],
+          "stranded_no_direction": [
+            1,
+            1
+          ],
+          "unregistered_alternative": [
+            0,
+            1
+          ],
+          "unregistered_kit": [
+            0,
+            2
+          ],
+          "unregistered_lookalike": [
+            0,
+            1
+          ]
+        },
+        "errors": [
+          {
+            "id": "R13",
+            "expected": "INSUFFICIENT",
+            "answer": "RF",
+            "category": "unregistered_alternative"
+          },
+          {
+            "id": "R15",
+            "expected": "RF",
+            "answer": "INSUFFICIENT",
+            "category": "unregistered_kit"
+          },
+          {
+            "id": "R16",
+            "expected": "RF",
+            "answer": "INSUFFICIENT",
+            "category": "unregistered_kit"
+          },
+          {
+            "id": "R17",
+            "expected": "UNSTRANDED",
+            "answer": "INSUFFICIENT",
+            "category": "unregistered_lookalike"
+          },
+          {
+            "id": "S07",
+            "expected": "RF",
+            "answer": "INSUFFICIENT",
+            "category": "abbreviation"
+          }
+        ]
+      },
+      "norag": {
+        "accuracy": [
+          17,
+          26
+        ],
+        "accuracy_wilson95": [
+          0.462,
+          0.806
+        ],
+        "confident_wrong": 5,
+        "answered_right": [
+          14,
+          19
+        ],
+        "abstain_recall": [
+          5,
+          7
+        ],
+        "abstain_precision": [
+          5,
+          7
+        ],
+        "kit_accuracy": null,
+        "confusion": {
+          "FR": {
+            "RF": 2
+          },
+          "RF": {
+            "RF": 9,
+            "UNSTRANDED": 1,
+            "INSUFFICIENT": 2
+          },
+          "UNSTRANDED": {
+            "UNSTRANDED": 5
+          },
+          "AMBIGUOUS": {
+            "RF": 1,
+            "INSUFFICIENT": 2
+          },
+          "INSUFFICIENT": {
+            "INSUFFICIENT": 3,
+            "RF": 1
+          }
+        },
+        "per_category": {
+          "abbreviation": [
+            1,
+            1
+          ],
+          "chemistry_only": [
+            1,
+            1
+          ],
+          "family_name": [
+            0,
+            1
+          ],
+          "generic_description": [
+            1,
+            1
+          ],
+          "lookalike": [
+            1,
+            1
+          ],
+          "multiple_kits": [
+            0,
+            2
+          ],
+          "named_kit": [
+            5,
+            6
+          ],
+          "named_kit_case": [
+            1,
+            1
+          ],
+          "named_kit_noisy": [
+            1,
+            1
+          ],
+          "named_kit_typo": [
+            0,
+            1
+          ],
+          "named_kit_version": [
+            0,
+            1
+          ],
+          "no_kit": [
+            2,
+            2
+          ],
+          "prompt_injection": [
+            1,
+            1
+          ],
+          "reordered_name": [
+            1,
+            1
+          ],
+          "stranded_no_direction": [
+            1,
+            1
+          ],
+          "unregistered_alternative": [
+            0,
+            1
+          ],
+          "unregistered_kit": [
+            0,
+            2
+          ],
+          "unregistered_lookalike": [
+            1,
+            1
+          ]
+        },
+        "errors": [
+          {
+            "id": "R07",
+            "expected": "AMBIGUOUS",
+            "answer": "RF",
+            "category": "multiple_kits"
+          },
+          {
+            "id": "R09",
+            "expected": "RF",
+            "answer": "UNSTRANDED",
+            "category": "named_kit_typo"
+          },
+          {
+            "id": "R12",
+            "expected": "AMBIGUOUS",
+            "answer": "INSUFFICIENT",
+            "category": "multiple_kits"
+          },
+          {
+            "id": "R13",
+            "expected": "INSUFFICIENT",
+            "answer": "RF",
+            "category": "unregistered_alternative"
+          },
+          {
+            "id": "R15",
+            "expected": "RF",
+            "answer": "INSUFFICIENT",
+            "category": "unregistered_kit"
+          },
+          {
+            "id": "R16",
+            "expected": "RF",
+            "answer": "INSUFFICIENT",
+            "category": "unregistered_kit"
+          },
+          {
+            "id": "S01",
+            "expected": "FR",
+            "answer": "RF",
+            "category": "named_kit"
+          },
+          {
+            "id": "S02",
+            "expected": "AMBIGUOUS",
+            "answer": "INSUFFICIENT",
+            "category": "family_name"
+          },
+          {
+            "id": "S09",
+            "expected": "FR",
+            "answer": "RF",
+            "category": "named_kit_version"
+          }
+        ]
+      }
+    }
+  },
+  "rows": [
+    {
+      "id": "R01",
+      "errors": {},
+      "scope": "IN_SCOPE",
+      "extract_rejected": [],
+      "rules": {
+        "answer": "RF",
+        "kit_id": "nebnext_ultra2_directional"
+      },
+      "rag": {
+        "answer": "RF",
+        "kit_id": "nebnext_ultra2_directional",
+        "rejected": [],
+        "retrieval_method": "alias",
+        "notes_quote": "NEBNext Ultra II Directional RNA-Seq kit",
+        "citation": {
+          "chunk_id": "nebnext_ultra2_directional",
+          "quote": "high quality directional (strand-specific) libraries"
+        },
+        "reason": "The notes explicitly name the NEBNext Ultra II Directional RNA-Seq kit, matching the directional NEBNext Ultra II candidate."
+      },
+      "norag": {
+        "answer": "RF",
+        "kit_guess": "NEBNext Ultra II Directional RNA-Seq kit",
+        "reason": "The notes specify a strand-specific library made with the NEBNext Ultra II Directional RNA-Seq kit, which uses dUTP-based directional chemistry, giving read 1 antisense to the transcript."
+      },
+      "seconds": 8.4
+    },
+    {
+      "id": "R02",
+      "errors": {},
+      "scope": "IN_SCOPE",
+      "extract_rejected": [],
+      "rules": {
+        "answer": "RF",
+        "kit_id": "nebnext_ultra2_directional"
+      },
+      "rag": {
+        "answer": "RF",
+        "kit_id": "nebnext_ultra2_directional",
+        "rejected": [],
+        "retrieval_method": "alias",
+        "notes_quote": "NEBNext Ultra II Directional kit",
+        "citation": {
+          "chunk_id": "nebnext_ultra2_directional",
+          "quote": "directional (strand-specific) libraries"
+        },
+        "reason": "The notes explicitly name the NEBNext Ultra II Directional kit, matching the candidate entry for that directional RNA library prep kit."
+      },
+      "norag": {
+        "answer": "RF",
+        "kit_guess": "NEBNext Ultra II Directional kit",
+        "reason": "The notes specify the NEBNext Ultra II Directional RNA-seq kit, a dUTP-based directional method that produces read 1 antisense to the transcript (RF)."
+      },
+      "seconds": 10.4
+    },
+    {
+      "id": "R03",
+      "errors": {},
+      "scope": "IN_SCOPE",
+      "extract_rejected": [],
+      "rules": {
+        "answer": "UNSTRANDED",
+        "kit_id": "nebnext_ultra2_nondirectional"
+      },
+      "rag": {
+        "answer": "UNSTRANDED",
+        "kit_id": "nebnext_ultra2_nondirectional",
+        "rejected": [],
+        "retrieval_method": "alias",
+        "notes_quote": "NEBNext Ultra II RNA Library Prep Kit",
+        "citation": {
+          "chunk_id": "nebnext_ultra2_nondirectional",
+          "quote": "non-directional double-stranded cDNA"
+        },
+        "reason": "The notes explicitly name the NEBNext Ultra II RNA Library Prep Kit (E7770), which matches the sole candidate entry describing a non-directional chemistry."
+      },
+      "norag": {
+        "answer": "UNSTRANDED",
+        "kit_guess": "NEBNext Ultra II RNA Library Prep Kit",
+        "reason": "The NEBNext Ultra II RNA Library Prep Kit (E7770) is a non-directional RNA library prep kit, so it retains no strand information."
+      },
+      "seconds": 6.9
+    },
+    {
+      "id": "R04",
+      "errors": {},
+      "scope": "IN_SCOPE",
+      "extract_rejected": [],
+      "rules": {
+        "answer": "UNSTRANDED",
+        "kit_id": "nebnext_ultra2_nondirectional"
+      },
+      "rag": {
+        "answer": "UNSTRANDED",
+        "kit_id": "nebnext_ultra2_nondirectional",
+        "rejected": [],
+        "retrieval_method": "alias",
+        "notes_quote": "NEBNext Ultra II RNA Library Prep Kit",
+        "citation": {
+          "chunk_id": "nebnext_ultra2_nondirectional",
+          "quote": "high quality non-directional libraries"
+        },
+        "reason": "The notes explicitly name the NEBNext Ultra II RNA Library Prep Kit, which matches the single candidate entry describing a non-directional RNA library prep chemistry."
+      },
+      "norag": {
+        "answer": "UNSTRANDED",
+        "kit_guess": "NEBNext Ultra II RNA Library Prep Kit",
+        "reason": "The notes name the non-directional NEBNext Ultra II RNA Library Prep Kit, which does not preserve strand information."
+      },
+      "seconds": 13.5
+    },
+    {
+      "id": "R05",
+      "errors": {},
+      "scope": "IN_SCOPE",
+      "extract_rejected": [],
+      "rules": {
+        "answer": "RF",
+        "kit_id": "truseq_stranded_mrna"
+      },
+      "rag": {
+        "answer": "RF",
+        "kit_id": "truseq_stranded_mrna",
+        "rejected": [],
+        "retrieval_method": "alias",
+        "notes_quote": "Truseq stranded mRNA library prep kit",
+        "citation": {
+          "chunk_id": "truseq_stranded_mrna",
+          "quote": "Read 1 maps to the antisense strand, and read 2 maps to the sense strand."
+        },
+        "reason": "The notes explicitly name the TruSeq Stranded mRNA library prep kit, matching the candidate entry."
+      },
+      "norag": {
+        "answer": "RF",
+        "kit_guess": "TruSeq Stranded mRNA Library Prep Kit",
+        "reason": "The Illumina TruSeq Stranded mRNA kit uses dUTP-based strand-specific chemistry, making read 1 antisense to the transcript (fr-firststrand/RF)."
+      },
+      "seconds": 8.5
+    },
+    {
+      "id": "R06",
+      "errors": {},
+      "scope": "IN_SCOPE",
+      "extract_rejected": [],
+      "rules": {
+        "answer": "UNSTRANDED",
+        "kit_id": "truseq_rna_v2"
+      },
+      "rag": {
+        "answer": "UNSTRANDED",
+        "kit_id": "truseq_rna_v2",
+        "rejected": [],
+        "retrieval_method": "alias",
+        "notes_quote": "TruSeq RNA Library Prep Kit v2",
+        "citation": {
+          "chunk_id": "truseq_rna_v2",
+          "quote": "does not retain or provide stranded information."
+        },
+        "reason": "The notes explicitly name TruSeq RNA Library Prep Kit v2, which matches the candidate registry entry and its non-stranded documentation."
+      },
+      "norag": {
+        "answer": "UNSTRANDED",
+        "kit_guess": "TruSeq RNA Library Prep Kit v2",
+        "reason": "The notes specify the standard non-stranded Illumina TruSeq RNA Library Prep Kit v2, which does not preserve transcript strand information."
+      },
+      "seconds": 11.9
+    },
+    {
+      "id": "R07",
+      "errors": {},
+      "scope": "IN_SCOPE",
+      "extract_rejected": [],
+      "rules": {
+        "answer": "AMBIGUOUS",
+        "kit_id": null
+      },
+      "rag": {
+        "answer": "AMBIGUOUS",
+        "kit_id": null,
+        "rejected": [],
+        "retrieval_method": "alias",
+        "notes_quote": null,
+        "citation": null,
+        "reason": "The notes list three candidate TruSeq kits as alternatives without specifying which one was used, so the kit cannot be distinguished."
+      },
+      "norag": {
+        "answer": "RF",
+        "kit_guess": null,
+        "reason": "The notes indicate a stranded TruSeq library (e.g., TruSeq Stranded mRNA/Total), which uses dUTP-based first-strand marking and yields read 1 antisense to the transcript, but the exact kit is not uniquely specified."
+      },
+      "seconds": 22.8
+    },
+    {
+      "id": "R08",
+      "errors": {},
+      "scope": "IN_SCOPE",
+      "extract_rejected": [],
+      "rules": {
+        "answer": "INSUFFICIENT",
+        "kit_id": null
+      },
+      "rag": {
+        "answer": "INSUFFICIENT",
+        "kit_id": null,
+        "rejected": [],
+        "retrieval_method": "none",
+        "notes_quote": null,
+        "citation": null,
+        "reason": "No kit or chemistry from the registry is named in the notes."
+      },
+      "norag": {
+        "answer": "INSUFFICIENT",
+        "kit_guess": null,
+        "reason": "The notes only state that standard Illumina mRNA libraries were prepared and give no information about strandedness or kit chemistry."
+      },
+      "seconds": 22.8
+    },
+    {
+      "id": "R09",
+      "errors": {},
+      "scope": "IN_SCOPE",
+      "extract_rejected": [],
+      "rules": {
+        "answer": "RF",
+        "kit_id": "kapa_mrna_hyperprep"
+      },
+      "rag": {
+        "answer": "RF",
+        "kit_id": "kapa_mrna_hyperprep",
+        "rejected": [],
+        "retrieval_method": "alias",
+        "notes_quote": "KAPA mRNA HyperPrep Kit",
+        "citation": {
+          "chunk_id": "kapa_mrna_hyperprep",
+          "quote": "Accurate strand origin information maintained using dUTP incorporation during second strand synthesis."
+        },
+        "reason": "The notes explicitly name the KAPA mRNA HyperPrep Kit, and the registry entry identifies its dUTP second-strand marking chemistry for strand information."
+      },
+      "norag": {
+        "answer": "UNSTRANDED",
+        "kit_guess": "KAPA mRNA HyperPrep Kit",
+        "reason": "The KAPA mRNA HyperPrep Kit is a non-stranded mRNA library prep kit, so it does not preserve transcript strand information."
+      },
+      "seconds": 11.1
+    },
+    {
+      "id": "R10",
+      "errors": {},
+      "scope": "IN_SCOPE",
+      "extract_rejected": [],
+      "rules": {
+        "answer": "RF",
+        "kit_id": "kapa_mrna_hyperprep"
+      },
+      "rag": {
+        "answer": "RF",
+        "kit_id": "kapa_mrna_hyperprep",
+        "rejected": [],
+        "retrieval_method": "alias",
+        "notes_quote": "KAPA mRNA HyperPrep Kit",
+        "citation": {
+          "chunk_id": "kapa_mrna_hyperprep",
+          "quote": "Accurate strand origin information maintained using dUTP incorporation during second strand synthesis."
+        },
+        "reason": "The notes explicitly name the KAPA mRNA HyperPrep Kit, and the registry entry describes its dUTP-based strand information handling."
+      },
+      "norag": {
+        "answer": "RF",
+        "kit_guess": "KAPA mRNA HyperPrep Kit",
+        "reason": "The KAPA mRNA HyperPrep Kit uses dUTP-based strand-specific library construction, yielding read 1 antisense to the transcript (RF)."
+      },
+      "seconds": 12.9
+    },
+    {
+      "id": "R11",
+      "errors": {},
+      "scope": "IN_SCOPE",
+      "extract_rejected": [],
+      "rules": {
+        "answer": "INSUFFICIENT",
+        "kit_id": null
+      },
+      "rag": {
+        "answer": "INSUFFICIENT",
+        "kit_id": null,
+        "rejected": [],
+        "retrieval_method": "none",
+        "notes_quote": null,
+        "citation": null,
+        "reason": "No kit or chemistry from the registry is named in the notes."
+      },
+      "norag": {
+        "answer": "INSUFFICIENT",
+        "kit_guess": null,
+        "reason": "The notes only mention a Qiagen RNeasy Plus RNA extraction kit and standard Illumina sequencing, without specifying a stranded or dUTP-based library prep method."
+      },
+      "seconds": 5.0
+    },
+    {
+      "id": "R12",
+      "errors": {
+        "extract": "LLMError: output was cut off at max_tokens; raise max_tokens"
+      },
+      "scope": null,
+      "rules": {
+        "answer": "AMBIGUOUS",
+        "kit_id": null
+      },
+      "rag": {
+        "answer": "AMBIGUOUS",
+        "kit_id": null,
+        "rejected": [],
+        "retrieval_method": "alias",
+        "notes_quote": null,
+        "citation": null,
+        "reason": "The notes name both TruSeq RNA Library Prep Kit v2 and Illumina Stranded mRNA Prep without indicating which one was used, so the choice is ambiguous."
+      },
+      "norag": {
+        "answer": "INSUFFICIENT",
+        "kit_guess": null,
+        "reason": "The notes name both an unstranded TruSeq RNA Library Prep Kit v2 and a stranded Illumina Stranded mRNA Prep, so the library strandedness cannot be determined."
+      },
+      "seconds": 41.1
+    },
+    {
+      "id": "R13",
+      "errors": {
+        "extract": "LLMError: output was cut off at max_tokens; raise max_tokens"
+      },
+      "scope": null,
+      "rules": {
+        "answer": "RF",
+        "kit_id": "illumina_stranded_mrna"
+      },
+      "rag": {
+        "answer": "RF",
+        "kit_id": "illumina_stranded_mrna",
+        "rejected": [],
+        "retrieval_method": "alias",
+        "notes_quote": "Illumina Stranded mRNA Prep",
+        "citation": {
+          "chunk_id": "illumina_stranded_mrna",
+          "quote": "Read 1 maps to the antisense strand and Read 2 maps to the sense strand."
+        },
+        "reason": "The notes explicitly name Illumina Stranded mRNA Prep, which matches the candidate registry entry and its documented strand information."
+      },
+      "norag": {
+        "answer": "RF",
+        "kit_guess": null,
+        "reason": "The notes list either Illumina Stranded mRNA Prep or Takara SMART-Seq mRNA, both dUTP-based stranded mRNA protocols that produce RF/fr-firststrand libraries with read 1 antisense to the transcript."
+      },
+      "seconds": 48.6
+    },
+    {
+      "id": "R14",
+      "errors": {},
+      "scope": "IN_SCOPE",
+      "extract_rejected": [],
+      "rules": {
+        "answer": "RF",
+        "kit_id": "illumina_stranded_mrna"
+      },
+      "rag": {
+        "answer": "RF",
+        "kit_id": "illumina_stranded_mrna",
+        "rejected": [],
+        "retrieval_method": "alias",
+        "notes_quote": "Illumina stranded mRNA",
+        "citation": {
+          "chunk_id": "illumina_stranded_mrna",
+          "quote": "Read 1 maps to the antisense strand and Read 2 maps to the sense strand."
+        },
+        "reason": "The notes explicitly name an Illumina stranded mRNA protocol, matching the Illumina Stranded mRNA Prep entry."
+      },
+      "norag": {
+        "answer": "RF",
+        "kit_guess": "Illumina TruSeq Stranded mRNA",
+        "reason": "The notes specify a standard Illumina stranded mRNA protocol, which uses dUTP-based strand marking, making read 1 antisense to the transcript (fr-firststrand/RF)."
+      },
+      "seconds": 6.7
+    },
+    {
+      "id": "R15",
+      "errors": {
+        "norag": "LLMError: output was cut off at max_tokens; raise max_tokens"
+      },
+      "scope": "IN_SCOPE",
+      "extract_rejected": [],
+      "rules": {
+        "answer": "INSUFFICIENT",
+        "kit_id": null
+      },
+      "rag": {
+        "answer": "INSUFFICIENT",
+        "kit_id": null,
+        "rejected": [],
+        "retrieval_method": "none",
+        "notes_quote": null,
+        "citation": null,
+        "reason": "No kit or chemistry from the registry is named in the notes."
+      },
+      "norag": {
+        "answer": "INSUFFICIENT",
+        "kit_guess": null
+      },
+      "seconds": 55.2
+    },
+    {
+      "id": "R16",
+      "errors": {
+        "extract": "LLMError: output was cut off at max_tokens; raise max_tokens",
+        "norag": "LLMError: output was cut off at max_tokens; raise max_tokens"
+      },
+      "scope": null,
+      "rules": {
+        "answer": "INSUFFICIENT",
+        "kit_id": null
+      },
+      "rag": {
+        "answer": "INSUFFICIENT",
+        "kit_id": null,
+        "rejected": [],
+        "retrieval_method": "none",
+        "notes_quote": null,
+        "citation": null,
+        "reason": "No kit or chemistry from the registry is named in the notes."
+      },
+      "norag": {
+        "answer": "INSUFFICIENT",
+        "kit_guess": null
+      },
+      "seconds": 45.1
+    },
+    {
+      "id": "R17",
+      "errors": {},
+      "scope": "IN_SCOPE",
+      "extract_rejected": [],
+      "rules": {
+        "answer": "INSUFFICIENT",
+        "kit_id": null
+      },
+      "rag": {
+        "answer": "INSUFFICIENT",
+        "kit_id": null,
+        "rejected": [],
+        "retrieval_method": "keyword",
+        "notes_quote": null,
+        "citation": null,
+        "reason": "The notes name 'NEBNext Ultra RNA Library Prep Kit', which does not clearly match either Ultra II directional or non-directional registry entry."
+      },
+      "norag": {
+        "answer": "UNSTRANDED",
+        "kit_guess": "NEBNext Ultra RNA Library Prep Kit",
+        "reason": "The notes name the non-directional NEBNext Ultra RNA Library Prep Kit, which does not preserve strand information."
+      },
+      "seconds": 17.7
+    },
+    {
+      "id": "S01",
+      "errors": {},
+      "scope": "IN_SCOPE",
+      "extract_rejected": [],
+      "rules": {
+        "answer": "FR",
+        "kit_id": "lexogen_corall"
+      },
+      "rag": {
+        "answer": "FR",
+        "kit_id": "lexogen_corall",
+        "rejected": [],
+        "retrieval_method": "alias",
+        "notes_quote": "CORALL Total RNA-Seq Library Prep Kit",
+        "citation": {
+          "chunk_id": "lexogen_corall",
+          "quote": "maintaining protocol-inherent strand specificity (>99 %)"
+        },
+        "reason": "The notes explicitly name the CORALL Total RNA-Seq Library Prep Kit, which matches the Lexogen CORALL entry and its documented strand specificity."
+      },
+      "norag": {
+        "answer": "RF",
+        "kit_guess": "CORALL Total RNA-Seq Library Prep Kit",
+        "reason": "The CORALL Total RNA-Seq Library Prep Kit produces strand-specific libraries in which read 1 is antisense to the original transcript, corresponding to RF/fr-firststrand."
+      },
+      "seconds": 20.7
+    },
+    {
+      "id": "S02",
+      "errors": {},
+      "scope": "IN_SCOPE",
+      "extract_rejected": [],
+      "rules": {
+        "answer": "AMBIGUOUS",
+        "kit_id": null
+      },
+      "rag": {
+        "answer": "AMBIGUOUS",
+        "kit_id": null,
+        "rejected": [],
+        "retrieval_method": "alias",
+        "notes_quote": null,
+        "citation": null,
+        "reason": "The notes name only the family 'NEBNext Ultra II kit' without specifying Directional, so both the directional and non-directional registry entries fit."
+      },
+      "norag": {
+        "answer": "INSUFFICIENT",
+        "kit_guess": "NEBNext Ultra II kit",
+        "reason": "The notes name a NEBNext Ultra II kit but do not specify whether it is the directional RNA kit, so strand orientation cannot be determined."
+      },
+      "seconds": 13.1
+    },
+    {
+      "id": "S03",
+      "errors": {},
+      "scope": "IN_SCOPE",
+      "extract_rejected": [],
+      "rules": {
+        "answer": "INSUFFICIENT",
+        "kit_id": null
+      },
+      "rag": {
+        "answer": "RF",
+        "kit_id": "kapa_mrna_hyperprep",
+        "rejected": [],
+        "retrieval_method": "keyword",
+        "notes_quote": "KAPA HyperPrep stranded mRNA kit",
+        "citation": {
+          "chunk_id": "kapa_mrna_hyperprep",
+          "quote": "Accurate strand origin information maintained using dUTP incorporation during second strand synthesis."
+        },
+        "reason": "The notes name the KAPA HyperPrep stranded mRNA kit, matching the KAPA mRNA HyperPrep Kit entry, whose vendor documentation describes dUTP second-strand marking for strand-specific sequencing."
+      },
+      "norag": {
+        "answer": "RF",
+        "kit_guess": "KAPA HyperPrep stranded mRNA kit",
+        "reason": "The KAPA HyperPrep stranded mRNA kit uses dUTP-based strand marking, yielding read 1 antisense to the transcript (fr-firststrand)."
+      },
+      "seconds": 11.0
+    },
+    {
+      "id": "S04",
+      "errors": {},
+      "scope": "IN_SCOPE",
+      "extract_rejected": [],
+      "rules": {
+        "answer": "RF",
+        "kit_id": "chem_dutp"
+      },
+      "rag": {
+        "answer": "RF",
+        "kit_id": "chem_dutp",
+        "rejected": [],
+        "retrieval_method": "alias",
+        "notes_quote": "dUTP-based stranded protocol",
+        "citation": {
+          "chunk_id": "chem_dutp",
+          "quote": "dUTP, NSR, NNSR | Equivalently, it is assumed that only the strand generated during first strand synthesis is sequenced."
+        },
+        "reason": "The notes describe a dUTP second-strand-marked stranded protocol without naming a kit, matching the chemistry-only dUTP candidate."
+      },
+      "norag": {
+        "answer": "RF",
+        "kit_guess": null,
+        "reason": "The notes specify a dUTP-based stranded protocol, which is the classic fr-firststrand/RF method where read 1 is antisense to the transcript."
+      },
+      "seconds": 8.5
+    },
+    {
+      "id": "S05",
+      "errors": {},
+      "scope": "IN_SCOPE",
+      "extract_rejected": [],
+      "rules": {
+        "answer": "INSUFFICIENT",
+        "kit_id": null
+      },
+      "rag": {
+        "answer": "INSUFFICIENT",
+        "kit_id": null,
+        "rejected": [],
+        "retrieval_method": "none",
+        "notes_quote": null,
+        "citation": null,
+        "reason": "No kit or chemistry from the registry is named in the notes."
+      },
+      "norag": {
+        "answer": "INSUFFICIENT",
+        "kit_guess": null,
+        "reason": "The notes state the libraries are stranded but do not specify the kit or method, so FR versus RF cannot be determined."
+      },
+      "seconds": 4.2
+    },
+    {
+      "id": "S06",
+      "errors": {},
+      "scope": "IN_SCOPE",
+      "extract_rejected": [],
+      "rules": {
+        "answer": "AMBIGUOUS",
+        "kit_id": null
+      },
+      "rag": {
+        "answer": "UNSTRANDED",
+        "kit_id": "truseq_rna_v2",
+        "rejected": [],
+        "retrieval_method": "alias",
+        "notes_quote": "TruSeq RNA Library Prep Kit v2",
+        "citation": {
+          "chunk_id": "truseq_rna_v2",
+          "quote": "Note that the TruSeq RNA v2 workflow does not retain or provide stranded information."
+        },
+        "reason": "The notes explicitly name TruSeq RNA Library Prep Kit v2, matching the non-stranded TruSeq RNA v2 registry entry."
+      },
+      "norag": {
+        "answer": "UNSTRANDED",
+        "kit_guess": "TruSeq RNA Library Prep Kit v2",
+        "reason": "The notes identify the non-stranded TruSeq RNA Library Prep Kit v2, which does not preserve transcript strand information."
+      },
+      "seconds": 7.4
+    },
+    {
+      "id": "S07",
+      "errors": {},
+      "scope": "IN_SCOPE",
+      "extract_rejected": [],
+      "rules": {
+        "answer": "INSUFFICIENT",
+        "kit_id": null
+      },
+      "rag": {
+        "answer": "INSUFFICIENT",
+        "kit_id": null,
+        "rejected": [],
+        "retrieval_method": "none",
+        "notes_quote": null,
+        "citation": null,
+        "reason": "No kit or chemistry from the registry is named in the notes."
+      },
+      "norag": {
+        "answer": "RF",
+        "kit_guess": "Ilmn Str mRNA prep",
+        "reason": "Illumina Stranded mRNA prep uses a dUTP-based stranded protocol in which read 1 is antisense to the transcript, giving RF/fr-firststrand orientation."
+      },
+      "seconds": 6.8
+    },
+    {
+      "id": "S08",
+      "errors": {},
+      "scope": "IN_SCOPE",
+      "extract_rejected": [],
+      "rules": {
+        "answer": "RF",
+        "kit_id": "truseq_stranded_total"
+      },
+      "rag": {
+        "answer": "RF",
+        "kit_id": "truseq_stranded_total",
+        "rejected": [],
+        "retrieval_method": "alias",
+        "notes_quote": "TruSeq Stranded Total RNA kit",
+        "citation": {
+          "chunk_id": "truseq_stranded_total",
+          "quote": "Read 1 maps to the antisense strand, and read 2 maps to the sense strand."
+        },
+        "reason": "The notes explicitly name the TruSeq Stranded Total RNA kit, which matches the candidate entry."
+      },
+      "norag": {
+        "answer": "RF",
+        "kit_guess": "TruSeq Stranded Total RNA kit",
+        "reason": "The TruSeq Stranded Total RNA kit uses a dUTP-based stranded protocol, so read 1 is antisense to the transcript (fr-firststrand/RF)."
+      },
+      "seconds": 16.8
+    },
+    {
+      "id": "S09",
+      "errors": {},
+      "scope": "IN_SCOPE",
+      "extract_rejected": [],
+      "rules": {
+        "answer": "FR",
+        "kit_id": "lexogen_corall"
+      },
+      "rag": {
+        "answer": "FR",
+        "kit_id": "lexogen_corall",
+        "rejected": [],
+        "retrieval_method": "alias",
+        "notes_quote": "Lexogen CORALL mRNA-Seq V2 with UDIs",
+        "citation": {
+          "chunk_id": "lexogen_corall",
+          "quote": "maintaining protocol-inherent strand specificity (>99 %)"
+        },
+        "reason": "The notes specifically name Lexogen CORALL mRNA-Seq V2 with UDIs, which matches the CORALL RNA-Seq candidate entry, and the cited vendor text states its strand specificity."
+      },
+      "norag": {
+        "answer": "RF",
+        "kit_guess": "Lexogen CORALL mRNA-Seq V2",
+        "reason": "Lexogen CORALL mRNA-Seq V2 is a strand-specific library prep whose read 1 is antisense to the transcript, corresponding to RF/fr-firststrand."
+      },
+      "seconds": 21.7
+    },
+    {
+      "id": "S10",
+      "errors": {},
+      "scope": "OUT_OF_SCOPE",
+      "extract_rejected": [],
+      "rules": {
+        "answer": "INSUFFICIENT",
+        "kit_id": null
+      },
+      "rag": {
+        "answer": "INSUFFICIENT",
+        "kit_id": null,
+        "rejected": [],
+        "retrieval_method": "none",
+        "notes_quote": null,
+        "citation": null,
+        "reason": "No kit or chemistry from the registry is named in the notes."
+      },
+      "norag": {
+        "answer": "INSUFFICIENT",
+        "kit_guess": "SQK-RNA004",
+        "reason": "The notes describe Oxford Nanopore direct RNA sequencing (SQK-RNA004), which reads native RNA without a cDNA read-1/read-2 strand convention, so an FR/RF strandedness label cannot be assigned."
+      },
+      "seconds": 12.2
+    },
+    {
+      "id": "S11",
+      "errors": {},
+      "scope": "OUT_OF_SCOPE",
+      "extract_rejected": [],
+      "rules": {
+        "answer": "INSUFFICIENT",
+        "kit_id": null
+      },
+      "rag": {
+        "answer": "INSUFFICIENT",
+        "kit_id": null,
+        "rejected": [],
+        "retrieval_method": "none",
+        "notes_quote": null,
+        "citation": null,
+        "reason": "No kit or chemistry from the registry is named in the notes."
+      },
+      "norag": {
+        "answer": "INSUFFICIENT",
+        "kit_guess": "PacBio Kinnex",
+        "reason": "The notes describe PacBio Kinnex long-read isoform sequencing, which does not provide the paired-end read1/read2 strandedness information needed to assign FR or RF."
+      },
+      "seconds": 13.5
+    }
+  ]
+}

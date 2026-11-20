@@ -2,6 +2,20 @@
 
 Dated record of every change, its reason, and its owner. Newest first.
 
+## 2026-11-19 — run 2 (branch `feat/eval-heldout`)
+
+Second model run at commit `e1c8bd6` (revised registry and labels; prompts unchanged). **Not blind**: the labels were revised after seeing run 1. Result file: `eval/results/cases_heldout_2026-11-19_e1c8bd6.{json,md}`.
+
+| Method | Correct | Wilson 95% | Confident wrong | Answered: right/total | Kit correct |
+|---|---|---|---|---|---|
+| Rules only | 19/26 | 0.54–0.86 | 1 | 13/14 | 12/15 |
+| LLM + registry (SeqSeec) | 21/26 | 0.62–0.92 | 1 | 15/16 | 14/15 |
+| Same LLM, no registry | 17/26 | 0.46–0.81 | 5 | 14/19 | n/a |
+
+- SeqSeec gave the same answers as run 1 on every in-scope case. Its errors: R13 (confident; unregistered alternative), R15–R17 (abstained; kits not in the registry), S07 (abstained; abbreviation "Ilmn Str mRNA prep").
+- The no-registry baseline answered both CORALL cases (S01, S09) as RF (vendor: FR), KAPA R09 as UNSTRANDED, and R07 (several kits listed) as RF.
+- Step 1 scope: 25/28. Step 1 hit `max_tokens` (4000) on R12, R13 and R16; the baseline hit it on R15 and R16. Follow-up: raise the limit or shorten reasoning for step 1.
+
 ## 2026-11-19 — labels second-checked; run 1 re-scored (branch `feat/eval-heldout`)
 
 ### Changed
