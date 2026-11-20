@@ -1,0 +1,187 @@
+{
+  "seqseec_version": "0.1.0",
+  "llm": {
+    "mode": "api",
+    "model": "deepseek-flash"
+  },
+  "steps": {
+    "extract": {
+      "status": "ok",
+      "fields": {
+        "kit_name": "CORALL Total RNA-Seq Library Prep Kit",
+        "kit_version": null,
+        "vendor": "Lexogen",
+        "chemistry": null,
+        "strand_statement": null,
+        "rna_selection": null,
+        "read_layout": "PE",
+        "platform": null,
+        "library_type": null,
+        "organism": null
+      },
+      "evidence": {
+        "kit_name": "CORALL Total RNA-Seq Library Prep Kit",
+        "vendor": "Lexogen",
+        "read_layout": "paired-end 2x150"
+      },
+      "rejected": [],
+      "scope": "IN_SCOPE",
+      "scope_reason": null,
+      "warnings": [],
+      "questions": [
+        "Which version of CORALL Total RNA-Seq Library Prep Kit was used? Some kits changed read orientation between versions."
+      ],
+      "llm": {
+        "prompt_id": "extract_v1",
+        "payload_sha256": "df05f03380883134f67e2fb71923f717a2efb2b01f621e85828b58da841121a1",
+        "requested_model": "deepseek-flash",
+        "response_model": "deepseek-flash",
+        "attempt": 1
+      }
+    },
+    "lookup": {
+      "status": "ok",
+      "document_orientation": "FR",
+      "decision": "KIT",
+      "kit_id": "lexogen_corall",
+      "kit_name": "CORALL RNA-Seq Library Prep Kit",
+      "evidence_type": "explicit",
+      "source_url": "https://www.lexogen.com/wp-content/uploads/2023/03/117UG228V0201_CORALL-RNA-Seq-with-UDIs_2023-03-28.pdf",
+      "notes_quote": "CORALL Total RNA-Seq Library Prep Kit",
+      "citation": {
+        "chunk_id": "lexogen_corall",
+        "quote": "maintaining protocol-inherent strand specificity (>99 %)"
+      },
+      "candidates": [
+        {
+          "kit_id": "lexogen_corall",
+          "matched_by": "alias",
+          "alias": "CORALL Total RNA-Seq",
+          "orientation": "FR",
+          "evidence": "explicit",
+          "kind": "kit"
+        }
+      ],
+      "retrieval_method": "alias",
+      "rejected": [],
+      "reason": "The notes name the Lexogen CORALL RNA-Seq Library Prep Kit, matching the sole CORALL candidate entry and its strand-specificity documentation.",
+      "rules_orientation": "FR",
+      "llm": {
+        "prompt_id": "infer_v1",
+        "payload_sha256": "4017f32679f73bf7cf8275fcc088891077026e47e372e1c32056510e9e91318b",
+        "requested_model": "deepseek-flash",
+        "response_model": "deepseek-flash",
+        "attempt": 1
+      }
+    },
+    "datacheck": {
+      "status": "skipped",
+      "reason": "no reads given"
+    },
+    "reconcile": {
+      "status": "ok",
+      "state": "UNVERIFIED",
+      "document_orientation": "FR",
+      "document_ambiguous": false,
+      "data_call": "NOT_RUN",
+      "layout": "PE",
+      "orientation": "FR",
+      "settings_basis": "documents",
+      "documents_confirmed_by_data": false,
+      "provisional": true,
+      "human_review_required": true,
+      "message": "Documents indicate FR. This has not been verified against the data.",
+      "likely_causes": [],
+      "suggested_checks": [],
+      "settings": {
+        "orientation": "FR",
+        "layout": "PE",
+        "library_type": "fr-secondstrand",
+        "rseqc_dominant": "1++,1--,2+-,2-+",
+        "tools": {
+          "featureCounts": {
+            "setting": "-s 1",
+            "note": "Option -s of featureCounts (Subread)."
+          },
+          "HISAT2": {
+            "setting": "--rna-strandness FR",
+            "note": "Option --rna-strandness at alignment time."
+          },
+          "Salmon": {
+            "setting": "-l ISF",
+            "note": "Library type, option -l of salmon quant. 'A' (auto-detect) is an alternative."
+          },
+          "kallisto": {
+            "setting": "--fr-stranded",
+            "note": "Option of kallisto quant; with --single it refers to the single read."
+          },
+          "HTSeq": {
+            "setting": "-s yes",
+            "note": "Option -s of htseq-count. Its default is 'yes', so unstranded data needs '-s no' set explicitly."
+          },
+          "STAR": {
+            "setting": "ReadsPerGene.out.tab column 3",
+            "note": "Which column of ReadsPerGene.out.tab (--quantMode GeneCounts) to use."
+          }
+        }
+      }
+    },
+    "explain": {
+      "status": "not_built",
+      "reason": "Step 7 (plain-language explanation) is not built yet."
+    }
+  },
+  "warnings": [],
+  "result": {
+    "state": "UNVERIFIED",
+    "document_orientation": "FR",
+    "document_ambiguous": false,
+    "data_call": "NOT_RUN",
+    "layout": "PE",
+    "orientation": "FR",
+    "settings_basis": "documents",
+    "documents_confirmed_by_data": false,
+    "provisional": true,
+    "human_review_required": true,
+    "message": "Documents indicate FR. This has not been verified against the data.",
+    "likely_causes": [],
+    "suggested_checks": [],
+    "settings": {
+      "orientation": "FR",
+      "layout": "PE",
+      "library_type": "fr-secondstrand",
+      "rseqc_dominant": "1++,1--,2+-,2-+",
+      "tools": {
+        "featureCounts": {
+          "setting": "-s 1",
+          "note": "Option -s of featureCounts (Subread)."
+        },
+        "HISAT2": {
+          "setting": "--rna-strandness FR",
+          "note": "Option --rna-strandness at alignment time."
+        },
+        "Salmon": {
+          "setting": "-l ISF",
+          "note": "Library type, option -l of salmon quant. 'A' (auto-detect) is an alternative."
+        },
+        "kallisto": {
+          "setting": "--fr-stranded",
+          "note": "Option of kallisto quant; with --single it refers to the single read."
+        },
+        "HTSeq": {
+          "setting": "-s yes",
+          "note": "Option -s of htseq-count. Its default is 'yes', so unstranded data needs '-s no' set explicitly."
+        },
+        "STAR": {
+          "setting": "ReadsPerGene.out.tab column 3",
+          "note": "Which column of ReadsPerGene.out.tab (--quantMode GeneCounts) to use."
+        }
+      }
+    }
+  },
+  "questions": [
+    "Which version of CORALL Total RNA-Seq Library Prep Kit was used? Some kits changed read orientation between versions."
+  ],
+  "errors": [],
+  "ok": true
+}

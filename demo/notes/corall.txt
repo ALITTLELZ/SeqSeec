@@ -1,0 +1,1 @@
+SYNTHETIC DEMO. Libraries were prepared with the CORALL Total RNA-Seq Library Prep Kit (Lexogen), paired-end 2x150.

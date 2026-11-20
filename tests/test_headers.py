@@ -1,7 +1,7 @@
 # File: tests/test_headers.py
-# Version: 0.1.0
-# Last modified: 2026-11-08 (Track B)
-# Change: Enforce the version header convention on every Python script.
+# Version: 0.1.1
+# Last modified: 2026-11-20 (XD)
+# Change: Also check scripts under demo/.
 """Every .py file must start with File / Version / Last modified / Change lines."""
 import pathlib
 import re
@@ -16,7 +16,7 @@ HEADER = re.compile(
 
 
 def python_files():
-    for d in ("seqseec", "tests", "eval", "scripts"):
+    for d in ("seqseec", "tests", "eval", "scripts", "demo"):
         yield from (ROOT / d).rglob("*.py") if (ROOT / d).exists() else []
 
 

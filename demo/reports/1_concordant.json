@@ -1,0 +1,200 @@
+{
+  "seqseec_version": "0.1.0",
+  "llm": {
+    "mode": "api",
+    "model": "deepseek-flash"
+  },
+  "steps": {
+    "extract": {
+      "status": "ok",
+      "fields": {
+        "kit_name": "NEBNext Ultra II Directional RNA Library Prep Kit",
+        "kit_version": null,
+        "vendor": null,
+        "chemistry": null,
+        "strand_statement": "Directional",
+        "rna_selection": "polyA",
+        "read_layout": "PE",
+        "platform": "NovaSeq 6000",
+        "library_type": null,
+        "organism": null
+      },
+      "evidence": {
+        "kit_name": "NEBNext Ultra II Directional RNA Library Prep Kit",
+        "strand_statement": "Directional",
+        "rna_selection": "poly(A)-selected",
+        "read_layout": "2x100",
+        "platform": "NovaSeq 6000"
+      },
+      "rejected": [],
+      "scope": "IN_SCOPE",
+      "scope_reason": null,
+      "warnings": [],
+      "questions": [
+        "Which version of NEBNext Ultra II Directional RNA Library Prep Kit was used? Some kits changed read orientation between versions."
+      ],
+      "llm": {
+        "prompt_id": "extract_v1",
+        "payload_sha256": "a99f78a0491606f34b091a67854cecff49fcaf66e55ec53eead364377575b9c6",
+        "requested_model": "deepseek-flash",
+        "response_model": "deepseek-flash",
+        "attempt": 1
+      }
+    },
+    "lookup": {
+      "status": "ok",
+      "document_orientation": "RF",
+      "decision": "KIT",
+      "kit_id": "nebnext_ultra2_directional",
+      "kit_name": "NEBNext Ultra II Directional RNA Library Prep Kit for Illumina",
+      "evidence_type": "inferred_from_chemistry",
+      "source_url": "https://www.neb.com/-/media/nebus/files/manuals/manuale7760_e7765.pdf",
+      "notes_quote": "NEBNext Ultra II Directional RNA Library Prep Kit",
+      "citation": {
+        "chunk_id": "nebnext_ultra2_directional",
+        "quote": "convert a broad range of input amounts of RNA into high quality directional (strand-specific) libraries"
+      },
+      "candidates": [
+        {
+          "kit_id": "nebnext_ultra2_directional",
+          "matched_by": "alias",
+          "alias": "NEBNext Ultra II Directional RNA Library Prep Kit",
+          "orientation": "RF",
+          "evidence": "inferred_from_chemistry",
+          "kind": "kit"
+        }
+      ],
+      "retrieval_method": "alias",
+      "rejected": [],
+      "reason": "The notes explicitly name the NEBNext Ultra II Directional RNA Library Prep Kit, matching the candidate entry.",
+      "rules_orientation": "RF",
+      "llm": {
+        "prompt_id": "infer_v1",
+        "payload_sha256": "1c4bc1f2540d064ff7a38daf68ea6e4df5169b4b12b2b1ece3661f4f31679379",
+        "requested_model": "deepseek-flash",
+        "response_model": "deepseek-flash",
+        "attempt": 1
+      }
+    },
+    "datacheck": {
+      "status": "ok",
+      "result": {
+        "layout": "PE",
+        "failed_fraction": 0.0,
+        "forward_fraction": 0.0,
+        "reverse_fraction": 1.0,
+        "forward_share": 0.0,
+        "reverse_share": 1.0,
+        "call": "RF",
+        "reason": "Over 90% of assignable reads have read 1 antisense to the transcript.",
+        "tool": "how_are_we_stranded_here@e6ce74d",
+        "nreads_requested": 200000
+      }
+    },
+    "reconcile": {
+      "status": "ok",
+      "state": "CONCORDANT",
+      "document_orientation": "RF",
+      "document_ambiguous": false,
+      "data_call": "RF",
+      "layout": "PE",
+      "orientation": "RF",
+      "settings_basis": "documents and data",
+      "documents_confirmed_by_data": true,
+      "provisional": false,
+      "human_review_required": false,
+      "message": "Documents and data agree: RF.",
+      "likely_causes": [],
+      "suggested_checks": [],
+      "settings": {
+        "orientation": "RF",
+        "layout": "PE",
+        "library_type": "fr-firststrand",
+        "rseqc_dominant": "1+-,1-+,2++,2--",
+        "tools": {
+          "featureCounts": {
+            "setting": "-s 2",
+            "note": "Option -s of featureCounts (Subread)."
+          },
+          "HISAT2": {
+            "setting": "--rna-strandness RF",
+            "note": "Option --rna-strandness at alignment time."
+          },
+          "Salmon": {
+            "setting": "-l ISR",
+            "note": "Library type, option -l of salmon quant. 'A' (auto-detect) is an alternative."
+          },
+          "kallisto": {
+            "setting": "--rf-stranded",
+            "note": "Option of kallisto quant; with --single it refers to the single read."
+          },
+          "HTSeq": {
+            "setting": "-s reverse",
+            "note": "Option -s of htseq-count. Its default is 'yes', so unstranded data needs '-s no' set explicitly."
+          },
+          "STAR": {
+            "setting": "ReadsPerGene.out.tab column 4",
+            "note": "Which column of ReadsPerGene.out.tab (--quantMode GeneCounts) to use."
+          }
+        }
+      }
+    },
+    "explain": {
+      "status": "not_built",
+      "reason": "Step 7 (plain-language explanation) is not built yet."
+    }
+  },
+  "warnings": [],
+  "result": {
+    "state": "CONCORDANT",
+    "document_orientation": "RF",
+    "document_ambiguous": false,
+    "data_call": "RF",
+    "layout": "PE",
+    "orientation": "RF",
+    "settings_basis": "documents and data",
+    "documents_confirmed_by_data": true,
+    "provisional": false,
+    "human_review_required": false,
+    "message": "Documents and data agree: RF.",
+    "likely_causes": [],
+    "suggested_checks": [],
+    "settings": {
+      "orientation": "RF",
+      "layout": "PE",
+      "library_type": "fr-firststrand",
+      "rseqc_dominant": "1+-,1-+,2++,2--",
+      "tools": {
+        "featureCounts": {
+          "setting": "-s 2",
+          "note": "Option -s of featureCounts (Subread)."
+        },
+        "HISAT2": {
+          "setting": "--rna-strandness RF",
+          "note": "Option --rna-strandness at alignment time."
+        },
+        "Salmon": {
+          "setting": "-l ISR",
+          "note": "Library type, option -l of salmon quant. 'A' (auto-detect) is an alternative."
+        },
+        "kallisto": {
+          "setting": "--rf-stranded",
+          "note": "Option of kallisto quant; with --single it refers to the single read."
+        },
+        "HTSeq": {
+          "setting": "-s reverse",
+          "note": "Option -s of htseq-count. Its default is 'yes', so unstranded data needs '-s no' set explicitly."
+        },
+        "STAR": {
+          "setting": "ReadsPerGene.out.tab column 4",
+          "note": "Which column of ReadsPerGene.out.tab (--quantMode GeneCounts) to use."
+        }
+      }
+    }
+  },
+  "questions": [
+    "Which version of NEBNext Ultra II Directional RNA Library Prep Kit was used? Some kits changed read orientation between versions."
+  ],
+  "errors": [],
+  "ok": true
+}

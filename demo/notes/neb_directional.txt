@@ -1,0 +1,1 @@
+SYNTHETIC DEMO. Total RNA was poly(A)-selected and libraries were built with the NEBNext Ultra II Directional RNA Library Prep Kit (E7760), then sequenced 2x100 on a NovaSeq 6000.
