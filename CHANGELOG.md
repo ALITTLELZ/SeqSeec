@@ -2,6 +2,11 @@
 
 Dated record of every change, its reason, and its owner. Newest first.
 
+## 2026-11-19 — prototype spec sheet (Track B, branch `docs/spec-sheet`)
+
+### Added
+- `docs/SeqSeec_SpecSheet.md` and `.pdf` (5 pages): all course template sections (basics, technical details, risk and compliance), run 2 evaluation table with the run 1 re-score and process notes, and the full text of prompts `extract_v1`, `infer_v1` and `infer_noretrieval_v1`. Team review pending before submission.
+
 ## 2026-11-20 — replay page: show the right eval run (XD, branch `fix/replay-eval-pick`, into #9)
 
 ### Fixed
