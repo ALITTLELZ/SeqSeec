@@ -28,7 +28,7 @@ Registry reviewed by the Track B owner against external review notes. **No orien
 - `lexogen_corall`: renamed to the CORALL RNA-Seq family (Total and mRNA, V1 and V2); catalog numbers per guide; V2 guide 171UG394V0111 added as a second source (same "Read 1 ... represents the transcript sequence" statement). Alias "CORALL RNA-Seq V2" added.
 - `chem_dutp`: source changed to the TopHat manual's library-type table (fr-firststrand examples "dUTP, NSR, NNSR"), with a note that RF assumes standard Illumina Y-adapter ligation; Illumina KB #2238 kept as supporting evidence in the note.
 - `illumina_stranded_total`: kept as a series entry; full orderable name added as an alias. `truseq_stranded_total`, `nebnext_ultra2_nondirectional`: notes only.
-- `checked_by` updated for all rows.
+- `checked_by` set to Zhen Liu for all rows (second check done).
 
 ## 2026-11-19 — one command, local LLM mode (XD, branch `feat/cli`)
 
