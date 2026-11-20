@@ -1,7 +1,7 @@
 # File: tests/test_cli.py
-# Version: 0.1.0
-# Last modified: 2026-11-19 (XD)
-# Change: Tests for the `seqseec` command: run (api / local / none), argument checks, output files, settings.
+# Version: 0.2.0
+# Last modified: 2026-11-19 (Track B)
+# Change: Fake server also answers step 3 (infer); local-mode test now covers both LLM calls.
 import functools
 import json
 import os
@@ -13,6 +13,7 @@ import pytest
 
 from seqseec.cli import main
 from seqseec.extract import extract
+from seqseec.infer import infer
 from seqseec.llm import LLMError
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -20,6 +21,10 @@ NOTES = ("Libraries were built with the NEBNext Ultra II Directional RNA Library
          "and sequenced 2x100 on a NovaSeq 6000.")
 ANSWER = {"fields": {"kit_name": "NEBNext Ultra II Directional RNA Library Prep Kit", "read_layout": "PE"},
           "evidence": {"kit_name": "NEBNext Ultra II Directional RNA Library Prep Kit", "read_layout": "2x100"}}
+INFER_ANSWER = {"decision": "KIT", "kit_id": "nebnext_ultra2_directional",
+                "notes_quote": "NEBNext Ultra II Directional RNA Library Prep Kit",
+                "citation": {"chunk_id": "nebnext_ultra2_directional",
+                             "quote": "high quality directional (strand-specific) libraries"}, "reason": "named"}
 
 
 class FakeServer:
@@ -32,8 +37,10 @@ class FakeServer:
         self.requests.append({"url": url, "headers": headers, "timeout": timeout})
         if self.error:
             raise self.error
+        is_infer = "kit registry" in body["messages"][0]["content"]
         return {"id": "r", "model": "served-model",
-                "choices": [{"finish_reason": "stop", "message": {"content": json.dumps(ANSWER)}}]}
+                "choices": [{"finish_reason": "stop",
+                             "message": {"content": json.dumps(INFER_ANSWER if is_infer else ANSWER)}}]}
 
 
 @pytest.fixture
@@ -48,7 +55,8 @@ def work(tmp_path, monkeypatch):
 
 
 def stages(server):
-    return {"extract": functools.partial(extract, transport=server)}
+    return {"extract": functools.partial(extract, transport=server),
+            "infer": functools.partial(infer, transport=server)}
 
 
 # ---------- run ----------
@@ -91,11 +99,12 @@ def test_local_mode_needs_no_key_and_never_sends_one(work, capsys, monkeypatch):
     server = FakeServer()
     code = main(["run", "--notes", "notes.txt", "--llm", "local", "--model", "llama3.1:8b",
                  "--data-call", "RF"], stages=stages(server))
-    req = server.requests[0]
-    assert code == 0 and req["url"] == "http://localhost:11434/v1/chat/completions"
-    assert "Authorization" not in req["headers"] and req["timeout"] == 300
+    assert code == 0 and len(server.requests) == 2          # step 1 extract + step 3 infer
+    for req in server.requests:
+        assert req["url"] == "http://localhost:11434/v1/chat/completions"
+        assert "Authorization" not in req["headers"] and req["timeout"] == 300
     out = capsys.readouterr().out
-    assert "LLM: local (llama3.1:8b)" in out and "RESULT: DATA_ONLY" in out
+    assert "LLM: local (llama3.1:8b)" in out and "RESULT: CONCORDANT" in out
     log = (work / "audit" / "llm_calls.jsonl").read_text(encoding="utf8")
     assert '"mode": "local"' in log and "sk-hosted" not in log
 

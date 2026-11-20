@@ -1,0 +1,46 @@
+alias,kit_ids
+TruSeq Stranded mRNA,truseq_stranded_mrna
+TruSeq Stranded mRNA Library Prep,truseq_stranded_mrna
+TruSeq Stranded mRNA LT,truseq_stranded_mrna
+TruSeq Stranded mRNA HT,truseq_stranded_mrna
+TruSeq Stranded Total RNA,truseq_stranded_total
+TruSeq Stranded Total RNA Library Prep,truseq_stranded_total
+TruSeq Stranded Total RNA with Ribo-Zero,truseq_stranded_total
+Illumina Stranded mRNA Prep,illumina_stranded_mrna
+Illumina Stranded mRNA,illumina_stranded_mrna
+Illumina Stranded Total RNA Prep,illumina_stranded_total
+Illumina Stranded Total RNA,illumina_stranded_total
+Illumina Stranded Total RNA Prep with Ribo-Zero Plus,illumina_stranded_total
+TruSeq RNA Library Prep Kit v2,truseq_rna_v2
+TruSeq RNA Sample Prep Kit v2,truseq_rna_v2
+TruSeq RNA v2,truseq_rna_v2
+TruSeq RNA Sample Preparation v2,truseq_rna_v2
+NEBNext Ultra II Directional RNA Library Prep Kit,nebnext_ultra2_directional
+NEBNext Ultra II Directional RNA,nebnext_ultra2_directional
+NEBNext Ultra II Directional,nebnext_ultra2_directional
+NEB Ultra II Directional,nebnext_ultra2_directional
+E7760,nebnext_ultra2_directional
+E7765,nebnext_ultra2_directional
+NEBNext Ultra II RNA Library Prep Kit,nebnext_ultra2_nondirectional
+NEBNext Ultra II RNA Library Prep,nebnext_ultra2_nondirectional
+NEBNext Ultra II RNA,nebnext_ultra2_nondirectional
+NEBNext Ultra II Non-Directional,nebnext_ultra2_nondirectional
+E7770,nebnext_ultra2_nondirectional
+E7775,nebnext_ultra2_nondirectional
+NEBNext Ultra II,nebnext_ultra2_directional;nebnext_ultra2_nondirectional
+TruSeq Stranded,truseq_stranded_mrna;truseq_stranded_total
+Illumina Stranded,illumina_stranded_mrna;illumina_stranded_total
+KAPA mRNA HyperPrep Kit,kapa_mrna_hyperprep
+KAPA mRNA HyperPrep,kapa_mrna_hyperprep
+KAPA mRNA Hyper Prep,kapa_mrna_hyperprep
+KAPA HyperPrep mRNA,kapa_mrna_hyperprep
+KK8580,kapa_mrna_hyperprep
+KK8581,kapa_mrna_hyperprep
+CORALL RNA-Seq,lexogen_corall
+CORALL Total RNA-Seq,lexogen_corall
+CORALL mRNA-Seq,lexogen_corall
+CORALL,lexogen_corall
+dUTP,chem_dutp
+deoxyuridine triphosphate,chem_dutp
+"Illumina Stranded Total RNA Prep, Ligation with Ribo-Zero Plus",illumina_stranded_total
+CORALL RNA-Seq V2,lexogen_corall

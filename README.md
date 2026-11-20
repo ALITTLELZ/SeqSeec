@@ -10,8 +10,8 @@ The team plan is in [docs/SeqSeec_Prototype_Plan_EN.pdf](docs/SeqSeec_Prototype_
 
 | Step | Module | Status |
 |---|---|---|
-| 1 Notes → fields (LLM) | `seqseec/extract.py`, `prompts/extract_v1.md` | **working with a fake LLM; live run pending**: quote-checked fields, scope decided by code, follow-up questions |
-| 2–3 Fields → kit → expected orientation (RAG + LLM) | `seqseec/retrieve.py`, `infer.py` | not started (needs the kit registry from Track A) |
+| 1 Notes → fields (LLM) | `seqseec/extract.py`, `prompts/extract_v1.md` | **working; live DeepSeek run OK on 2026-11-19**: quote-checked fields, scope decided by code, follow-up questions |
+| 2–3 Notes → kit registry → expected orientation | `library/kit_registry.csv`, `seqseec/retrieve.py`, `infer.py`, `prompts/infer_v1.md` | **working**: 10 registry entries, each with a vendor source and verbatim quote; alias + keyword retrieval; LLM picks among candidates, code checks quotes and looks up the orientation; rules-only mode for `--llm none`; no-retrieval baseline for evaluation |
 | 4 Local data check | `seqseec/datacheck.py` | **working**: wraps how_are_we_stranded_here; 7/7 smoke tests pass |
 | 5–6 Reconcile, downstream settings | `seqseec/reconcile.py`, `settings.py` | **working**: decision table (incl. out-of-scope) and settings lookup; settings checked against official tool docs |
 | 7 Explanation | `seqseec/explain.py` | not started |

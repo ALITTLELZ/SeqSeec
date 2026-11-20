@@ -1,7 +1,7 @@
 # File: tests/test_pipeline.py
-# Version: 0.1.0
-# Last modified: 2026-11-19 (XD)
-# Change: Tests for run_pipeline(): step order and statuses, failures recorded not raised, layout rules, report text.
+# Version: 0.2.0
+# Last modified: 2026-11-19 (Track B)
+# Change: Steps 2-3 are built: lookup tests use a fake infer stage; rules-only lookup with --llm none.
 import functools
 import json
 
@@ -78,11 +78,38 @@ def test_defaults_cover_every_cli_option():
 
 # ---------- steps 1 -> 2-3 ----------
 
-def test_notes_without_kit_lookup_give_data_only():
-    report = run({"extract": fake_extract()}, notes=NOTES, data_call="RF")
-    assert report["steps"]["extract"]["status"] == "ok"
-    assert report["steps"]["lookup"]["status"] == "not_built"
-    assert report["result"]["state"] == "DATA_ONLY" and report["questions"] == ["Which version?"]
+def fake_infer(orientation="RF", calls=None):
+    def _infer(notes, fields, **kw):
+        if calls is not None:
+            calls.append({"fields": fields, **kw})
+        return {"document_orientation": orientation, "decision": "KIT", "kit_id": "nebnext_ultra2_directional",
+                "kit_name": "NEBNext Ultra II Directional RNA Library Prep Kit for Illumina",
+                "evidence_type": "inferred_from_chemistry", "source_url": "https://www.neb.com/x.pdf",
+                "notes_quote": "NEBNext Ultra II Directional RNA Library Prep Kit",
+                "citation": {"chunk_id": "nebnext_ultra2_directional", "quote": "directional (strand-specific)"},
+                "candidates": [], "retrieval_method": "alias", "rejected": [], "reason": "named", "llm": {}}
+    return _infer
+
+
+def test_notes_go_through_kit_lookup():
+    calls = []
+    report = run({"extract": fake_extract(), "infer": fake_infer(calls=calls)}, notes=NOTES, data_call="RF")
+    assert report["steps"]["extract"]["status"] == "ok" and report["steps"]["lookup"]["status"] == "ok"
+    assert calls[0]["fields"]["kit_name"] == FIELDS["kit_name"] and calls[0]["config"] == CONFIG
+    assert report["result"]["state"] == "CONCORDANT" and report["questions"] == ["Which version?"]
+
+
+def test_lookup_llm_error_is_recorded():
+    report = run({"extract": fake_extract(), "infer": failing(LLMError("timeout"))}, notes=NOTES, data_call="RF")
+    assert report["steps"]["lookup"]["status"] == "error" and not report["ok"]
+    assert report["result"]["state"] == "DATA_ONLY"
+
+
+def test_llm_none_uses_registry_rules():
+    report = run(notes=NOTES, llm="none", data_call="FR")
+    look = report["steps"]["lookup"]
+    assert look["status"] == "ok" and look["kit_id"] == "nebnext_ultra2_directional"
+    assert report["result"]["state"] == "CONFLICT"   # registry says RF, reads say FR
 
 
 def test_expected_with_notes_and_data():
@@ -184,4 +211,11 @@ def test_text_report_has_the_essentials():
 
 def test_text_report_says_what_is_not_built():
     text = format_report(run(llm="none", data_call="INCONCLUSIVE"))
-    assert "RESULT: INSUFFICIENT" in text and "Steps 2-3" in text and "Step 7" in text
+    assert "RESULT: INSUFFICIENT" in text and "Step 7" in text
+
+
+def test_text_report_shows_registry_evidence():
+    text = format_report(run(notes=NOTES, llm="none", data_call="RF"))
+    for needle in ("From the kit registry", "NEBNext Ultra II Directional", "inferred_from_chemistry",
+                   "neb.com", "document result  RF"):
+        assert needle in text, needle

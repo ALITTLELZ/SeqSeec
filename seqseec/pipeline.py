@@ -1,12 +1,12 @@
 # File: seqseec/pipeline.py
-# Version: 0.1.0
-# Last modified: 2026-11-19 (XD)
-# Change: One-run pipeline behind `seqseec run`: steps 1, 2-3 (stub), 4, 5-6, 7 (stub) -> one report dict.
+# Version: 0.2.0
+# Last modified: 2026-11-19 (Track B)
+# Change: Steps 2-3 wired in: kit registry retrieval + inference (LLM, or rules only with --llm none).
 """Run every step once and return one report. The command line is in seqseec/cli.py.
 
 Steps run in STEP_ORDER. Each records a status in report["steps"][name]:
   extract    step 1, notes -> checked fields (LLM)      ok | skipped | error
-  lookup     steps 2-3, fields -> expected orientation   not_built | given | out_of_scope
+  lookup     steps 2-3, notes -> registry -> orientation  ok | given | out_of_scope | skipped | error
   datacheck  step 4, reads -> data call (local tools)    ok | given | skipped | error
   reconcile  steps 5-6, decision table + settings       ok
   explain    step 7, plain explanation (LLM)            not_built
@@ -18,13 +18,15 @@ DATA_ONLY). Errors are listed in the report, and report["ok"] is False.
 Adding a parameter: add it to DEFAULTS here and to the matching argument group
 in cli.py, then read it in the step that needs it. Adding a step: write a
 _step_<name>(opts, report, stages) function and add it to STEP_ORDER / _STEPS.
-Steps 2-3 and 7 are placeholders so their report slots already exist.
+Step 7 is a placeholder so its report slot already exists. Steps 2-3 use the
+curated kit registry (seqseec.retrieve); with --llm none they use rules only.
 """
 import os
 
 from seqseec import __version__
 from seqseec.datacheck import run_check_strandedness
 from seqseec.extract import extract
+from seqseec.infer import infer, infer_rules
 from seqseec.llm import LLMError
 from seqseec.reconcile import reconcile
 from seqseec.settings import normalize_layout, normalize_orientation
@@ -47,10 +49,8 @@ DEFAULTS = {
     "audit_dir": "audit",
 }
 
-DEFAULT_STAGES = {"extract": extract, "datacheck": run_check_strandedness}
-
-LOOKUP_NOT_BUILT = ("Steps 2-3 (kit registry and retrieval) are not built yet, so the kit's orientation "
-                    "is unknown. Give it with --expected if you know it.")
+DEFAULT_STAGES = {"extract": extract, "infer": infer, "infer_rules": infer_rules,
+                  "datacheck": run_check_strandedness}
 
 
 def _options(options):
@@ -101,7 +101,19 @@ def _step_lookup(opts, report, stages):
                 "reason": extracted.get("scope_reason")}
     if opts["expected"]:
         return {"status": "given", "document_orientation": opts["expected"], "reason": "given with --expected"}
-    return {"status": "not_built", "document_orientation": None, "reason": LOOKUP_NOT_BUILT}
+    if not opts["notes"]:
+        return {"status": "skipped", "document_orientation": None, "reason": "no notes given"}
+    fields = extracted.get("fields") or {}
+    try:
+        if opts["llm"] == "none":
+            out = stages["infer_rules"](opts["notes"], fields)
+        else:
+            out = stages["infer"](opts["notes"], fields, config=opts["llm_config"],
+                                  audit_log=os.path.join(opts["audit_dir"], "payload_audit.jsonl"),
+                                  call_log=os.path.join(opts["audit_dir"], "llm_calls.jsonl"))
+    except (LLMError, ValueError) as err:  # PayloadError is a ValueError
+        return {"status": "error", "document_orientation": None, "error": f"{type(err).__name__}: {err}"}
+    return {"status": "ok", **out}
 
 
 def _step_datacheck(opts, report, stages):
@@ -203,9 +215,18 @@ def format_report(report):
         lines += ["", "From the notes (each with a verbatim quote):"]
         lines += [f"  {k:<17}{v}   <- \"{ext['evidence'].get(k, '')}\"" for k, v in found.items()] or ["  (nothing)"]
         lines += [f"  dropped {x['field']}: {x['reason']}" for x in ext["rejected"]]
-    for name in ("lookup", "explain"):
-        if steps[name]["status"] == "not_built":
-            lines += ["", f"Note: {steps[name]['reason']}"]
+    look = steps["lookup"]
+    if look["status"] == "ok":
+        lines += ["", f"From the kit registry (retrieval: {look['retrieval_method']}):"]
+        if look.get("kit_name"):
+            lines.append(f"  kit              {look['kit_name']}   <- \"{look['notes_quote']}\"")
+            lines.append(f"  evidence         {look['evidence_type']}: {look['source_url']}")
+            if look.get("citation"):
+                lines.append(f"  vendor quote     \"{look['citation']['quote']}\"")
+        lines.append(f"  document result  {look['document_orientation']}" + (f" ({look['reason']})" if look.get("reason") else ""))
+        lines += [f"  rejected: {x}" for x in look.get("rejected", [])]
+    if steps["explain"]["status"] == "not_built":
+        lines += ["", f"Note: {steps['explain']['reason']}"]
     for title, items in (("Questions", report["questions"]), ("Warnings", report["warnings"]),
                          ("Errors", report["errors"])):
         if items:
