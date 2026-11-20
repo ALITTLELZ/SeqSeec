@@ -1,12 +1,12 @@
 # SeqSeec — Prototype Spec Sheet
 
-BIOINF 535 Group Project · Xiaomeng Du, Zhen Liu, Mariam Fateh · Prototype version v0.4 (2026-11-19)
+BIOINF 535 Group Project · Xiaomeng Du, Zhen Liu, Mariam Fateh · Prototype version v0.5 (2026-11-20)
 
 ## The Basics
 
 **App name and link.** SeqSeec (Sequence Strandedness Extraction and Evaluation).
 - Replay of saved runs: https://claude.ai/artifact/FQTyKAKEwg7kWqKY9KoPCZ (static replay of five saved runs and the evaluation; shared by the team on request)
-- Code: GitHub repository `ALITTLELZ/SeqSeec` (private during development; access on request).
+- Code: GitHub repository `ALITTLELZ/SeqSeec`, branch `main` (private during development; access on request).
 - Run locally: `pip install -e .` then `seqseec run --notes notes.txt --r1 R1.fq.gz --r2 R2.fq.gz --gtf genes.gtf --transcripts tx.fa`.
 
 **Brief description.** SeqSeec reads the lab notes for an RNA-seq experiment, identifies the library-prep kit, and looks up the read orientation that kit gives (FR, RF or unstranded) in a curated registry of vendor documents. It checks that expectation against the reads themselves with how_are_we_stranded_here run on the user's own machine. It then reports agreement or conflict and the matching setting for featureCounts, HISAT2, Salmon, kallisto, HTSeq and STAR.
@@ -68,7 +68,7 @@ What distinguishes it: how_are_we_stranded_here and RSeQC can call strandedness 
 - **Evaluation size:** small test set (26 in-scope cases), labeled by the team.
 
 **Testing and validation.**
-- **Unit and integration tests:** 334 pass (`python -m pytest -q tests`). They cover every cell of the reconciliation table, the settings table, citation checks (fabricated quotes are rejected), look-alike handling, payload isolation (no read sequences in the audit log), and the command line.
+- **Unit and integration tests:** 338 pass (`python -m pytest -q tests`). They cover every cell of the reconciliation table, the settings table, citation checks (fabricated quotes are rejected), look-alike handling, payload isolation (no read sequences in the audit log), the command line, and the replay page (a rebuild from the committed results must match the published page byte for byte).
 - **Read check:** 7/7 simulated cases call correctly (paired-end FR/RF/unstranded, R1/R2 swapped, single-end FR/RF/unstranded), run end to end through `seqseec run`.
 - **Settings table:** every value checked against official documentation for featureCounts, HISAT2, Salmon, kallisto, HTSeq and STAR.
 - **Held-out notes evaluation** (`eval/`): 28 cases, of which 17 are real GEO descriptions and 2 are out of scope. Labels were first written from vendor documents before any model run, then second-checked by Zhen Liu after run 1 (4 of 28 revised; see the process note below). Three methods were compared on the same cases: rules only, LLM + registry (SeqSeec), and the same LLM without the registry.

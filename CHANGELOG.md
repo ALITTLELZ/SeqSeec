@@ -2,10 +2,15 @@
 
 Dated record of every change, its reason, and its owner. Newest first.
 
-## 2026-11-19 — prototype spec sheet (Track B, branch `docs/spec-sheet`)
+## 2026-11-20 — prototype spec sheet v0.5 (Track B, branch `docs/spec-sheet`)
 
 ### Added
-- `docs/SeqSeec_SpecSheet.md` and `.pdf` (5 pages): all course template sections (basics, technical details, risk and compliance), run 2 evaluation table with the run 1 re-score and process notes, and the full text of prompts `extract_v1`, `infer_v1` and `infer_noretrieval_v1`. Team review pending before submission.
+- `docs/SeqSeec_SpecSheet.md`: the prototype spec sheet in the course template (basics, technical details, risk and compliance), with the run 2 evaluation table, the run 1 re-score and process notes, and the full text of prompts `extract_v1`, `infer_v1` and `infer_noretrieval_v1`. This Markdown file is the source; edit it, not the copies.
+- `docs/SeqSeec_SpecSheet.docx`: the same content laid out like the proposal, for uploading to Google Docs and editing together. Rebuild with `python scripts/build_spec_docx.py` after the Markdown changes.
+
+### Changed
+- Spec sheet updated after reviewing `main` (v0.4 → v0.5): 338 tests (includes the replay-page rebuild test from #10); code is on `main`.
+- README status table brought up to date (live API checks done, steps 2–3 built, evaluation, replay page, spec sheet).
 
 ## 2026-11-20 — replay page: show the right eval run (XD, branch `fix/replay-eval-pick`, into #9)
 

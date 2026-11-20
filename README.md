@@ -6,7 +6,7 @@ SeqSeec helps analysts with computational backgrounds work out how an RNA-seq li
 
 The team plan is in [docs/SeqSeec_Prototype_Plan_EN.pdf](docs/SeqSeec_Prototype_Plan_EN.pdf).
 
-## Status (v0.1-env, 2026-11-08)
+## Status (2026-11-20)
 
 | Step | Module | Status |
 |---|---|---|
@@ -16,8 +16,11 @@ The team plan is in [docs/SeqSeec_Prototype_Plan_EN.pdf](docs/SeqSeec_Prototype_
 | 5–6 Reconcile, downstream settings | `seqseec/reconcile.py`, `settings.py` | **working**: decision table (incl. out-of-scope) and settings lookup; settings checked against official tool docs |
 | 7 Explanation | `seqseec/explain.py` | not started |
 | LLM payload gate + audit log (used by steps 1, 3, 7) | `seqseec/payload.py` | **working**: per-task allow-lists, read/FASTQ/API-key guards, append-only audit log |
-| LLM client (used by steps 1, 3, 7) | `seqseec/llm.py` | **working**. Two modes: `api` (DeepSeek; untested against the live API, so run `python scripts/check_llm_live.py` with a key, see CHANGELOG to-do) and `local` (Ollama on this machine; one real run on 2026-11-19 with `qwen3.5:2b`). JSON mode, accepts only `build_payload()` output, retries blank/invalid JSON, logs model ID and usage per call |
-| One command | `seqseec/cli.py`, `pipeline.py` | **working**: `seqseec run` runs every step and prints one report; steps 2–3 and 7 are placeholders |
+| LLM client (used by steps 1, 3, 7) | `seqseec/llm.py` | **working**. Two modes: `api` (DeepSeek; live checks OK on 2026-11-19, see CHANGELOG) and `local` (Ollama on this machine; one real run on 2026-11-19 with `qwen3.5:2b`, not evaluated). JSON mode, accepts only `build_payload()` output, retries blank/invalid JSON, logs model ID and usage per call |
+| One command | `seqseec/cli.py`, `pipeline.py` | **working**: `seqseec run` runs every step and prints one report; step 7 is a placeholder |
+| Evaluation | `eval/` | **done for the prototype**: 28 held-out notes (17 real GEO); run 2: SeqSeec 21/26 correct, 1 confident wrong; same LLM without the registry 17/26, 5 confident wrong |
+| Replay page | `demo/` | **working**: static replay of five saved runs + the evaluation, rebuilt by `demo/build_replay.py` |
+| Spec sheet | `docs/SeqSeec_SpecSheet.md` (+ `.docx` for Google Docs) | prototype spec sheet, v0.5 |
 
 ## Setup
 
