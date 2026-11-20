@@ -1,7 +1,7 @@
 # File: seqseec/retrieve.py
-# Version: 0.1.0
+# Version: 0.1.1
 # Last modified: 2026-11-19 (Track B)
-# Change: Step 2 retrieval over the curated kit registry: alias matching (longest span wins) plus keyword fallback.
+# Change: Chunk text also carries the registry's evidence_note (limits of the evidence) after the second check.
 """Step 2: find the kit-registry entries that the notes may refer to.
 
 The library is library/kit_registry.csv (hand-curated; every orientation has a
@@ -86,7 +86,8 @@ def load_aliases(registry, path=ALIASES_PATH):
 def chunk_for(row, matched_by, matched_alias=None, score=None):
     """Registry row -> payload chunk. The text holds the vendor quote verbatim, so citations can be checked."""
     text = (f"{row['kit_name']} ({row['vendor'] or 'any vendor'}). Chemistry: {row['chemistry']}. "
-            f"Source ({row['source_title']}, {row['source_version']}): \"{row['source_quote']}\"")
+            f"Source ({row['source_title']}, {row['source_version']}): \"{row['source_quote']}\""
+            + (f" Note: {row['evidence_note']}" if row.get("evidence_note") else ""))
     chunk = {"chunk_id": row["kit_id"], "text": text, "kit": row["kit_name"], "vendor": row["vendor"] or None,
              "source": row["source_url"], "version": row["source_version"], "date": row["accessed"]}
     if score is not None:

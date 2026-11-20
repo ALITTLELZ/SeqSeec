@@ -20,6 +20,16 @@ Dated record of every change, its reason, and its owner. Newest first.
 - Six synthetic notes, step 3 with vs without retrieval: KAPA (reordered name) → retrieval RF, rules INSUFFICIENT; CORALL → retrieval **FR** (vendor: Read 1 = transcript), no-retrieval **RF (wrong)**; NEBNext family name → AMBIGUOUS.
 - The no-retrieval call hit `max_tokens` 2000 once (1465 reasoning tokens), so step 3 now defaults to 4000.
 
+### Revised after second check (2026-11-19)
+Registry reviewed by the Track B owner against external review notes. **No orientation changed**; only evidence wording, names and catalog numbers. The held-out evaluation (commit `fba4c90`) used the registry before this revision and is not re-run.
+- New column `evidence_note` (limits of each source), also appended to the chunk text the LLM sees.
+- `nebnext_ultra2_directional`: removed "The NEBNext libraries for Illumina resemble TruSeq libraries" from the quote. It sits in the manual's adapter-trimming section and is not evidence of read orientation. Note added that the manual does not state R1/R2 orientation; RF stays `inferred_from_chemistry`.
+- `kapa_mrna_hyperprep`: catalog corrected from KR1352 (the document code) to KK8580 / KK8581 (Roche 08098115702 / 08098123702); noted the source is a third-party hosted 2017 copy and Roche has newer instructions. Aliases: KR1352 replaced by KK8580 and KK8581.
+- `lexogen_corall`: renamed to the CORALL RNA-Seq family (Total and mRNA, V1 and V2); catalog numbers per guide; V2 guide 171UG394V0111 added as a second source (same "Read 1 ... represents the transcript sequence" statement). Alias "CORALL RNA-Seq V2" added.
+- `chem_dutp`: source changed to the TopHat manual's library-type table (fr-firststrand examples "dUTP, NSR, NNSR"), with a note that RF assumes standard Illumina Y-adapter ligation; Illumina KB #2238 kept as supporting evidence in the note.
+- `illumina_stranded_total`: kept as a series entry; full orderable name added as an alias. `truseq_stranded_total`, `nebnext_ultra2_nondirectional`: notes only.
+- `checked_by` updated for all rows.
+
 ## 2026-11-19 — one command, local LLM mode (XD, branch `feat/cli`)
 
 ### Added

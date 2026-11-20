@@ -34,10 +34,13 @@ KAPA mRNA HyperPrep Kit,kapa_mrna_hyperprep
 KAPA mRNA HyperPrep,kapa_mrna_hyperprep
 KAPA mRNA Hyper Prep,kapa_mrna_hyperprep
 KAPA HyperPrep mRNA,kapa_mrna_hyperprep
-KR1352,kapa_mrna_hyperprep
+KK8580,kapa_mrna_hyperprep
+KK8581,kapa_mrna_hyperprep
 CORALL RNA-Seq,lexogen_corall
 CORALL Total RNA-Seq,lexogen_corall
 CORALL mRNA-Seq,lexogen_corall
 CORALL,lexogen_corall
 dUTP,chem_dutp
 deoxyuridine triphosphate,chem_dutp
+"Illumina Stranded Total RNA Prep, Ligation with Ribo-Zero Plus",illumina_stranded_total
+CORALL RNA-Seq V2,lexogen_corall
