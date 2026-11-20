@@ -2,6 +2,24 @@
 
 Dated record of every change, its reason, and its owner. Newest first.
 
+## 2026-11-19 — labels second-checked; run 1 re-scored (branch `feat/eval-heldout`)
+
+### Changed
+- Zhen Liu second-checked all 28 held-out labels: 20 agreed, 8 disagreed on 6 points.
+  - **Revised (4):** R13 AMBIGUOUS → INSUFFICIENT (the Takara branch's library prep is unknown, so no conflict is shown); R15 → RF and R16 → RF (Takara Pico v2/v3 manuals: Read 1 antisense); R17 → UNSTRANDED (NEB E7530 is non-directional). The old labels for R15–R17 followed SeqSeec's registry coverage; labels now follow the best available vendor evidence, so abstaining on an unregistered kit counts as a miss, not a correct answer.
+  - **Kept (4), with the evidence type added to the rationale:** R09, R10, S03 stay RF (KAPA, `inferred_from_chemistry`, consistent with the registry and with R01/R02 for NEB Directional); S04 stays RF (registry option A: TopHat convention, standard Illumina adapters).
+  - `labeled_by` set to Zhen Liu.
+- `eval/run_eval.py` 0.2.0: new "answered: right/total" metric; `--rescore` (re-score saved answers against current labels, no model calls); `--note`.
+
+### Run 1 re-scored (same answers, revised labels)
+| Method | Correct | Confident wrong | Answered: right/total |
+|---|---|---|---|
+| Rules only | 19/26 | 1 | 13/14 |
+| LLM + registry (SeqSeec) | 21/26 | 1 | 15/16 |
+| Same LLM, no registry | 19/26 | 2 | 15/17 |
+
+The accuracy gap narrows; SeqSeec's advantage is that it answers only when it can cite a source (one confident error, R13). Its misses on R15–R17 are registry coverage gaps (Takara Pico, NEB E7530 are not in the registry).
+
 ## 2026-11-19 — held-out evaluation, run once (Track B, branch `feat/eval-heldout`)
 
 ### Added

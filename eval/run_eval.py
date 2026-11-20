@@ -1,7 +1,7 @@
 # File: eval/run_eval.py
-# Version: 0.1.0
+# Version: 0.2.0
 # Last modified: 2026-11-19 (Track B)
-# Change: Evaluate step 1 scope and step 3 (rules / LLM+retrieval / LLM without retrieval) on a case file.
+# Change: Add answered-with-a-direction metric, --rescore (new labels, no model calls) and --note.
 """Run the notes-level evaluation (plan §6A) and write an append-only result file.
 
 For each case: step 1 extract (LLM) -> fields and scope; then three ways to get the
@@ -15,10 +15,13 @@ Scoring (cases expected OUT_OF_SCOPE are scored on step 1 scope only):
   confident_wrong        answered FR/RF/UNSTRANDED but the expected label differs (the unsafe error)
   abstain recall/precision  "no single answer" (AMBIGUOUS or INSUFFICIENT) vs expected
   kit accuracy           chosen kit == expected kit, over cases with an expected kit
+  answered / right       how many cases got a direction (FR/RF/UNSTRANDED) and how many of those were right
 Accuracy comes with a Wilson 95% interval; with this few cases, read the raw counts.
 
 Usage (repo root; needs DEEPSEEK_API_KEY in .env; costs a few cents):
-  python eval/run_eval.py eval/cases_heldout.jsonl [--workers 4]
+  python eval/run_eval.py eval/cases_heldout.jsonl [--workers 4] [--note "..."]
+  python eval/run_eval.py eval/cases_heldout.jsonl --rescore eval/results/<earlier>.json --note "..."
+      (re-score saved answers against the current labels; no model calls)
 Writes eval/results/<casefile>_<date>_<commit>.json (+ .md summary). Never overwrites.
 """
 import argparse
@@ -93,7 +96,7 @@ def score(cases, rows):
                "scope_correct": sum(by_id[c["id"]]["scope"] == c["expected_scope"] for c in cases),
                "arms": {}}
     for arm in ARMS:
-        correct = confident_wrong = 0
+        correct = confident_wrong = answered = answered_right = 0
         abst_tp = abst_fp = abst_fn = 0
         kit_n = kit_ok = 0
         confusion = collections.defaultdict(collections.Counter)
@@ -106,8 +109,10 @@ def score(cases, rows):
             correct += ok
             per_cat[c["category"]][0] += ok
             per_cat[c["category"]][1] += 1
-            if ans in DIRECTIONS and not ok:
-                confident_wrong += 1
+            if ans in DIRECTIONS:
+                answered += 1
+                answered_right += ok
+                confident_wrong += not ok
             exp_abst, ans_abst = exp not in DIRECTIONS, ans not in DIRECTIONS
             abst_tp += exp_abst and ans_abst
             abst_fp += ans_abst and not exp_abst
@@ -120,7 +125,7 @@ def score(cases, rows):
         n = len(in_scope)
         metrics["arms"][arm] = {
             "accuracy": [correct, n], "accuracy_wilson95": wilson(correct, n),
-            "confident_wrong": confident_wrong,
+            "confident_wrong": confident_wrong, "answered_right": [answered_right, answered],
             "abstain_recall": [abst_tp, abst_tp + abst_fn], "abstain_precision": [abst_tp, abst_tp + abst_fp],
             "kit_accuracy": [kit_ok, kit_n] if arm != "norag" else None,
             "confusion": {e: dict(confusion[e]) for e in LABELS if e in confusion},
@@ -135,13 +140,18 @@ def markdown(meta, metrics):
              f"- Date: {meta['date']}  |  commit `{meta['commit']}`  |  model `{meta['model']}` ({meta['mode']})",
              f"- Prompts: {meta['prompts']}",
              f"- Cases: {metrics['n_cases']} ({metrics['n_in_scope']} in scope, {metrics['n_out_of_scope']} out of scope)",
-             f"- Step 1 scope correct: {metrics['scope_correct']}/{metrics['n_cases']}", "",
-             "| Arm | Accuracy | Wilson 95% | Confident wrong | Abstain recall | Abstain precision | Kit accuracy |",
-             "|---|---|---|---|---|---|---|"]
+             f"- Step 1 scope correct: {metrics['scope_correct']}/{metrics['n_cases']}"]
+    if meta.get("note"):
+        lines.append(f"- Note: {meta['note']}")
+    if meta.get("rescored_from"):
+        lines.append(f"- Answers re-scored from `{meta['rescored_from']}` (no new model calls)")
+    lines += ["", "| Arm | Accuracy | Wilson 95% | Confident wrong | Answered: right/total | Abstain recall | Abstain precision | Kit accuracy |",
+              "|---|---|---|---|---|---|---|---|"]
     for arm, m in metrics["arms"].items():
         kit = f"{m['kit_accuracy'][0]}/{m['kit_accuracy'][1]}" if m["kit_accuracy"] else "n/a"
         lines.append(f"| {arm} | {m['accuracy'][0]}/{m['accuracy'][1]} | {m['accuracy_wilson95']} | "
-                     f"{m['confident_wrong']} | {m['abstain_recall'][0]}/{m['abstain_recall'][1]} | "
+                     f"{m['confident_wrong']} | {m['answered_right'][0]}/{m['answered_right'][1]} | "
+                     f"{m['abstain_recall'][0]}/{m['abstain_recall'][1]} | "
                      f"{m['abstain_precision'][0]}/{m['abstain_precision'][1]} | {kit} |")
     for arm, m in metrics["arms"].items():
         lines += ["", f"## {arm}: errors"]
@@ -154,8 +164,16 @@ def main():
     ap.add_argument("case_file")
     ap.add_argument("--workers", type=int, default=4)
     ap.add_argument("--audit-dir", default="audit/eval")
+    ap.add_argument("--rescore", metavar="RESULTS_JSON", help="re-score saved answers; no model calls")
+    ap.add_argument("--note", default="", help="free-text note stored with the results")
     args = ap.parse_args()
     cases = [json.loads(line) for line in open(args.case_file, encoding="utf8") if line.strip()]
+    if args.rescore:
+        old = json.load(open(args.rescore, encoding="utf8"))
+        meta = dict(old["meta"], note=args.note, rescored_from=os.path.relpath(args.rescore, ROOT),
+                    rescored_on=datetime.date.today().isoformat())
+        _write(args, meta, score(cases, old["rows"]), old["rows"], suffix="_rescored")
+        return
     config = get_config()
     if not config["api_key"]:
         sys.exit("No DEEPSEEK_API_KEY in the environment or .env; nothing was sent.")
@@ -164,11 +182,15 @@ def main():
                                 capture_output=True, text=True).stdout.strip())
     meta = {"case_file": os.path.basename(args.case_file), "date": datetime.date.today().isoformat(),
             "commit": commit + ("-dirty" if dirty else ""), "model": config["model"], "mode": config["mode"],
-            "prompts": {"extract": EXTRACT_PROMPT, "infer": INFER_PROMPT, "baseline": BASELINE_PROMPT_ID}}
+            "prompts": {"extract": EXTRACT_PROMPT, "infer": INFER_PROMPT, "baseline": BASELINE_PROMPT_ID},
+            "note": args.note}
     with concurrent.futures.ThreadPoolExecutor(args.workers) as pool:
         rows = list(pool.map(lambda c: run_case(c, config, args.audit_dir), cases))
-    metrics = score(cases, rows)
-    stem = f"{os.path.splitext(meta['case_file'])[0]}_{meta['date']}_{meta['commit']}"
+    _write(args, meta, score(cases, rows), rows)
+
+
+def _write(args, meta, metrics, rows, suffix=""):
+    stem = f"{os.path.splitext(meta['case_file'])[0]}_{meta['date']}_{meta['commit']}{suffix}"
     out = os.path.join(ROOT, "eval", "results", stem)
     n = 1
     while os.path.exists(out + ".json"):
