@@ -20,6 +20,7 @@ Dated record of every change, its reason, and its owner. Newest first.
 - The no-registry baseline hit `max_tokens` on 3 cases (R16, S01, S09); these count as INSUFFICIENT, which made S01 and S09 wrong. In the dev run without a cutoff, the baseline answered CORALL as RF, which is also wrong.
 - SeqSeec's one confident error is R13 ("Illumina Stranded mRNA Prep **or** Takara SMART-Seq mRNA"): the alternative kit is not in the registry, so only one candidate was seen. Limitation: an unregistered alternative can hide ambiguity.
 - No prompt was changed after this run.
+- Traceability: the run used commit `fba4c90` (registry before the second-check revision). After the branches were restacked that commit is no longer on the branch, so it is kept as tag `eval-heldout-2026-11-19`. The revision changed no orientation.
 
 ## 2026-11-19 — steps 2–3: kit registry, retrieval, document inference (Track B, branch `feat/kit-registry`)
 
