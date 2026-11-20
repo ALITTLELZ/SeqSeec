@@ -204,17 +204,19 @@ function renderEval(ev) {
   const m = ev.metrics, meta = ev.meta;
   const names = {rules: "Rules only (no LLM)", rag: "LLM + kit registry (SeqSeec)", norag: "Same LLM, no registry"};
   const pct = ([k, n]) => `${k}/${n}`;
-  const sum = el("table", {}, el("thead", {}, el("tr", {}, ["Method", "Correct", "95% CI", "Confident wrong", "Kit correct"].map(h => el("th", {}, h)))),
+  const sum = el("table", {}, el("thead", {}, el("tr", {}, ["Method", "Correct", "95% CI", "Confident wrong", "Answered: right / total", "Kit correct"].map(h => el("th", {}, h)))),
     el("tbody", {}, Object.entries(m.arms).map(([arm, a]) => el("tr", {},
       el("td", {}, names[arm]), el("td", {class: "mono"}, pct(a.accuracy)),
       el("td", {class: "mono"}, a.accuracy_wilson95 ? a.accuracy_wilson95.map(x => Math.round(x * 100) + "%").join("–") : ""),
-      el("td", {class: "mono"}, a.confident_wrong), el("td", {class: "mono"}, a.kit_accuracy ? pct(a.kit_accuracy) : "n/a")))));
+      el("td", {class: "mono"}, a.confident_wrong), el("td", {class: "mono"}, a.answered_right ? pct(a.answered_right) : ""),
+      el("td", {class: "mono"}, a.kit_accuracy ? pct(a.kit_accuracy) : "n/a")))));
   const cell = (ans, exp) => el("td", {class: "mono " + (ans === exp ? "hit" : "miss")}, ans);
   const rows = el("table", {}, el("thead", {}, el("tr", {}, ["Case", "Source", "Category", "Expected", "Rules", "SeqSeec", "No registry"].map(h => el("th", {}, h)))),
     el("tbody", {}, ev.rows.map(r => el("tr", {}, el("td", {class: "mono"}, r.id), el("td", {}, r.source), el("td", {}, r.category.replaceAll("_", " ")),
       el("td", {class: "mono"}, r.expected), cell(r.rules, r.expected), cell(r.rag, r.expected), cell(r.norag, r.expected)))));
-  box.append(el("h2", {id: "eval-h"}, "Held-out evaluation"),
-    el("p", {class: "lede"}, `${m.n_in_scope} in-scope cases (${ev.rows.filter(r => r.source === "real").length} from real GEO library descriptions, the rest synthetic), labeled from vendor documents before any model run, and run once on ${meta.date} with ${meta.model}. Out-of-scope cases (${m.n_out_of_scope}) are scored on step 1 only: ${m.scope_correct}/${m.n_cases} scope decisions were correct. "Confident wrong" counts answers that named a direction when the expected answer was different, which is the error that matters most. With this few cases, read the counts rather than the percentages.`),
+  box.append(el("h2", {id: "eval-h"}, "Evaluation on 28 test notes"),
+    el("p", {class: "lede"}, `${m.n_in_scope} in-scope cases (${ev.rows.filter(r => r.source === "real").length} from real GEO library descriptions, the rest synthetic), labeled from vendor documents and second-checked by a team member. Run on ${meta.date} with ${meta.model}. Out-of-scope cases (${m.n_out_of_scope}) are scored on step 1 only: ${m.scope_correct}/${m.n_cases} scope decisions were correct. "Confident wrong" counts answers that named a direction when the expected answer was different, which is the error that matters most. "Answered" shows how often each method gave a direction and how many of those were right. With this few cases, read the counts rather than the percentages.`),
+    meta.note ? el("p", {class: "muted"}, meta.note + " The first run (before the label review) gave SeqSeec the same answers; its results are kept in the repository.") : null,
     el("div", {class: "tablebox"}, sum), el("h3", {}, "Every case"), el("div", {class: "tablebox"}, rows),
     el("p", {class: "muted"}, `Source: ${ev.file} (commit ${meta.commit}).`));
 }

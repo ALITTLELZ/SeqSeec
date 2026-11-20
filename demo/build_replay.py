@@ -1,7 +1,7 @@
 # File: demo/build_replay.py
-# Version: 0.1.0
+# Version: 0.1.1
 # Last modified: 2026-11-19 (Track B)
-# Change: Build the static replay page (demo/index.html) from saved reports and the latest evaluation result.
+# Change: Show the newest real model run (skip re-scored files) and its note.
 """Build demo/index.html, a static replay of pre-computed SeqSeec runs.
 
 Inputs (all already in the repo):
@@ -49,7 +49,8 @@ def load_cases():
 
 
 def load_eval():
-    files = sorted(glob.glob(os.path.join(ROOT, "eval", "results", "cases_heldout_*.json")), key=os.path.getmtime)
+    files = sorted((f for f in glob.glob(os.path.join(ROOT, "eval", "results", "cases_heldout_*.json"))
+                    if "_rescored" not in f), key=os.path.getmtime)
     if not files:
         return None
     data = json.load(open(files[-1], encoding="utf8"))
