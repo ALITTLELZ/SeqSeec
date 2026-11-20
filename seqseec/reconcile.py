@@ -1,10 +1,10 @@
 # File: seqseec/reconcile.py
-# Version: 0.2.0
-# Last modified: 2026-11-19 (XD)
-# Change: PR #1 review follow-ups: OUT_OF_SCOPE state; verified_by_data -> documents_confirmed_by_data; looser input spelling; clearer AMBIGUOUS message; checks kept for INSUFFICIENT.
+# Version: 0.2.1
+# Last modified: 2026-11-20 (Track B)
+# Change: Removed references to the retired team plan document (comments only).
 """Step 5: reconcile what the documents say with what the reads show.
 
-Deterministic decision table from plan §5. Documents show what was *intended*;
+Deterministic decision table. Documents show what was *intended*;
 reads show what the files *are*. Neither silently overrides the other.
 
 | Document     | Data                  | State        | Settings                                   |
@@ -19,7 +19,7 @@ reads show what the files *are*. Neither silently overrides the other.
 
 X is FR, RF or UNSTRANDED. AMBIGUOUS from step 3 (candidate kits disagree
 and the notes cannot separate them) is treated as INSUFFICIENT and flagged.
-OUT_OF_SCOPE covers protocols outside plan §2 (e.g. Nanopore, PacBio, single-cell).
+OUT_OF_SCOPE covers protocols outside SeqSeec's scope (e.g. Nanopore, PacBio, single-cell).
 
 Result fields that say how far to trust the settings:
   settings_basis               "documents and data" | "data" | "documents" | None

@@ -1,13 +1,13 @@
 # File: tests/test_settings.py
-# Version: 0.1.0
-# Last modified: 2026-11-18 (XD)
-# Change: Unit tests for the step 6 settings lookup table.
+# Version: 0.1.1
+# Last modified: 2026-11-20 (Track B)
+# Change: Removed references to the retired team plan document (comments only).
 import pytest
 
 from seqseec.datacheck import FORWARD_PATTERN, REVERSE_PATTERN
 from seqseec.settings import SOURCES, TOOLS, UNSET, get_settings, normalize_layout, normalize_orientation
 
-# Plan §5 settings table (paired-end).
+# Step 6 settings table (paired-end).
 PE_TABLE = {
     "FR": {"featureCounts": "-s 1", "HISAT2": "--rna-strandness FR", "Salmon": "-l ISF",
            "kallisto": "--fr-stranded", "HTSeq": "-s yes", "STAR": "ReadsPerGene.out.tab column 3"},

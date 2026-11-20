@@ -2,6 +2,32 @@
 
 Dated record of every change, its reason, and its owner. Newest first.
 
+## 2026-11-20 — retire the original team plan; version 0.5.0 (Track B, branch `docs/spec-sheet`)
+
+### Removed
+- `docs/SeqSeec_Prototype_Plan_EN.md` and `.pdf`: the Nov 8 team plan has been superseded by the spec sheet. Older CHANGELOG entries still mention it as history.
+- README link to the plan and the plan's milestone-tag list (only `v0.1-env` was ever created).
+- "plan §N" references in code comments and docstrings (11 files; comments only, no behaviour change; file headers bumped).
+
+### Changed
+- Package version 0.1.0 → 0.5.0 (`pyproject.toml`, `seqseec/__init__.py`) to match spec sheet v0.5. Saved reports and the replay page keep the version they were produced with.
+- README: status heading shows v0.5; `docs/` described as the spec sheet folder; tags section lists the tags that exist.
+
+## 2026-11-20 — prototype spec sheet v0.5 (Track B, branch `docs/spec-sheet`)
+
+### Added
+- `docs/SeqSeec_SpecSheet.md`: the prototype spec sheet in the course template (basics, technical details, risk and compliance), with the run 2 evaluation table, the run 1 re-score and process notes, and the full text of prompts `extract_v1`, `infer_v1` and `infer_noretrieval_v1`. This Markdown file is the source; edit it, not the copies.
+- `docs/SeqSeec_SpecSheet.docx`: the same content laid out like the proposal, for uploading to Google Docs and editing together. Rebuild with `python scripts/build_spec_docx.py` after the Markdown changes.
+
+### Changed
+- Spec sheet updated after reviewing `main` (v0.4 → v0.5): 338 tests (includes the replay-page rebuild test from #10); code is on `main`.
+- README status table brought up to date (live API checks done, steps 2–3 built, evaluation, replay page, spec sheet).
+
+### Synced from the team's Google Doc (2026-11-20)
+- The team edited the spec sheet in Google Docs, which is now the reference version. `docs/SeqSeec_SpecSheet.md` was rewritten to match it word for word (checked sentence by sentence against the exported PDF): section 1 renamed "The Tool Basics" with explicit "1.1 APP Name and Link"-style headings; the link is the public GitHub repository; Platform lists the three running modes (API, local LLM, no LLM); sections 3.1–3.5 are rewritten as full paragraphs with bold labels. The appendix prompts are unchanged and still match `prompts/` exactly.
+- `scripts/build_spec_docx.py` 0.2.0: keeps headings that are already numbered and the appendix heading as written; numeric table columns get a minimum width so "19/26" stays on one line.
+- **From now on, edit the Google Doc first, then copy the changes back here** so the repository keeps the submitted version.
+
 ## 2026-11-20 — replay page: show the right eval run (XD, branch `fix/replay-eval-pick`, into #9)
 
 ### Fixed

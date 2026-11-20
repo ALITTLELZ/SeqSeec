@@ -1,13 +1,13 @@
 # File: tests/test_reconcile.py
-# Version: 0.2.0
-# Last modified: 2026-11-19 (XD)
-# Change: Cover PR #1 review follow-ups (OUT_OF_SCOPE row, documents_confirmed_by_data, spelling, messages, checks).
+# Version: 0.2.1
+# Last modified: 2026-11-20 (Track B)
+# Change: Removed references to the retired team plan document (comments only).
 import pytest
 
 from seqseec.reconcile import (INCONCLUSIVE_CHECKS, INSUFFICIENT_MESSAGE, INVALID_CHECKS, OUT_OF_SCOPE_MESSAGE,
                                STATES, reconcile)
 
-# Plan §5 decision table, written out cell by cell.
+# Step 5 decision table, written out cell by cell.
 # Rows: document result. Columns: data call (None = data check not run).
 DATA_COLUMNS = ["FR", "RF", "UNSTRANDED", "INCONCLUSIVE", "INVALID", None]
 GRID = {

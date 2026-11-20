@@ -1,10 +1,10 @@
 # File: seqseec/settings.py
-# Version: 0.1.1
-# Last modified: 2026-11-18 (XD)
-# Change: Checked every setting against official docs/source; added SOURCES with what each confirms.
+# Version: 0.1.2
+# Last modified: 2026-11-20 (Track B)
+# Change: Removed references to the retired team plan document (comments only).
 """Step 6: translate a library orientation into downstream tool settings.
 
-This is a fixed lookup table, not an LLM call (plan §3 and §5). Given an
+This is a fixed lookup table, not an LLM call. Given an
 orientation (FR, RF or UNSTRANDED) and a layout (PE or SE), it returns the
 setting that each downstream tool needs.
 
@@ -14,7 +14,7 @@ Orientation conventions (same as seqseec.datacheck):
   UNSTRANDED  no strand information                  (fr-unstranded)
 
 Every value was checked against the tool's official documentation or source
-code on 2026-11-18 (plan §5, "verify each item"). SOURCES records where each
+code on 2026-11-18. SOURCES records where each
 check came from. Re-check whenever a tool version changes.
 """
 from seqseec.datacheck import FORWARD_PATTERN, REVERSE_PATTERN
